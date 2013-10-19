@@ -4,6 +4,7 @@
 *.so
 
 # Packages
+MANIFEST
 *.egg
 *.egg-info
 dist
@@ -23,8 +24,10 @@ __pycache__
 pip-log.txt
 
 # Unit test / coverage reports
+.cache/
+.idea/
+.tox/
 .coverage
-.tox
 nosetests.xml
 
 # Translations
