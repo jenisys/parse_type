@@ -1,0 +1,41 @@
+# =========================================================================
+# COVERAGE CONFIGURATION FILE: .coveragerc
+# =========================================================================
+# LANGUAGE: Python
+# SEE ALSO:
+#  * http://nedbatchelder.com/code/coverage/
+#  * http://nedbatchelder.com/code/coverage/config.html
+# =========================================================================
+
+[run]
+data_file = .coverage
+source   = parse_type
+branch   = True
+parallel = False
+omit = mock.py, ez_setup.py, distribute.py
+
+
+[report]
+ignore_errors = False
+show_missing  = True
+exclude_lines =
+    # pragma: no cover
+    # pragma: recursive coverage
+    def __repr__
+
+    raise AssertionError
+    raise NotImplementedError
+
+    if 0:
+    if False:
+    if __name__ == .__main__.:
+
+[html]
+directory = build/coverage.html
+title = Coverage Report: parse_type
+
+[xml]
+outfile = build/coverage.xml
+
+
+

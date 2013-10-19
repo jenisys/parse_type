@@ -1,0 +1,13 @@
+*.pyc
+*.pyo
+
+.cache/
+.idea/
+.tox/
+.coverage
+__pycache__/
+build/
+dist/
+downloads/
+
+MANIFEST
