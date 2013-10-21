@@ -45,21 +45,94 @@ class TestCardinalityField(TestCase):
 
     def test_matches_type_name(self):
         for type_name in self.VALID_TYPE_NAMES:
-            self.assertTrue(CardinalityField.matches_type_name(type_name))
+            self.assertTrue(CardinalityField.matches_type(type_name))
 
         for type_name in self.INVALID_TYPE_NAMES:
-            self.assertFalse(CardinalityField.matches_type_name(type_name))
+            self.assertFalse(CardinalityField.matches_type(type_name))
 
-    def test_type_basename__with_valid_types(self):
+    def test_split_type__with_valid_special_names(self):
+        actual = CardinalityField.split_type("Color?")
+        self.assertEqual(actual, ("Color", Cardinality.optional))
+        self.assertEqual(actual, ("Color", Cardinality.zero_or_one))
+
+        actual = CardinalityField.split_type("Color+")
+        self.assertEqual(actual, ("Color", Cardinality.many))
+        self.assertEqual(actual, ("Color", Cardinality.one_or_more))
+
+        actual = CardinalityField.split_type("Color*")
+        self.assertEqual(actual, ("Color", Cardinality.many0))
+        self.assertEqual(actual, ("Color", Cardinality.zero_or_more))
+
+    def test_split_type__with_valid_special_names2(self):
         for type_name in self.VALID_TYPE_NAMES:
-            expected = type_name[:-1]
-            self.assertEqual(CardinalityField.type_basename(type_name), expected)
+            self.assertTrue(CardinalityField.matches_type(type_name))
+            cardinality_char = type_name[-1]
+            expected_basename = type_name[:-1]
+            expected_cardinality = CardinalityField.from_char_map[cardinality_char]
+            expected = (expected_basename, expected_cardinality)
+            actual = CardinalityField.split_type(type_name)
+            self.assertEqual(actual, expected)
 
-    def test_type_basename__with_invalid_types(self):
+    def test_split_type__with_cardinality_one(self):
+        actual = CardinalityField.split_type("Color")
+        self.assertEqual(actual, ("Color", Cardinality.one))
+
+    def test_split_type__with_invalid_names(self):
         for type_name in self.INVALID_TYPE_NAMES:
-            expected = type_name
-            self.assertEqual(CardinalityField.type_basename(type_name), expected)
+            expected = (type_name, Cardinality.one)
+            actual = CardinalityField.split_type(type_name)
+            self.assertEqual(actual, expected)
+            self.assertFalse(CardinalityField.matches_type(type_name))
 
+    def test_make_type__with_cardinality_one(self):
+        expected = "Number"
+        type_name = CardinalityField.make_type("Number", Cardinality.one)
+        self.assertEqual(type_name, expected)
+        self.assertFalse(CardinalityField.matches_type(type_name))
+
+    def test_make_type__with_cardinality_optional(self):
+        expected = "Number?"
+        type_name = CardinalityField.make_type("Number", Cardinality.optional)
+        self.assertEqual(type_name, expected)
+        self.assertTrue(CardinalityField.matches_type(type_name))
+
+        type_name2 = CardinalityField.make_type("Number", Cardinality.zero_or_one)
+        self.assertEqual(type_name2, expected)
+        self.assertEqual(type_name2, type_name)
+
+    def test_make_type__with_cardinality_many(self):
+        expected = "Number+"
+        type_name = CardinalityField.make_type("Number", Cardinality.many)
+        self.assertEqual(type_name, expected)
+        self.assertTrue(CardinalityField.matches_type(type_name))
+
+        type_name2 = CardinalityField.make_type("Number", Cardinality.one_or_more)
+        self.assertEqual(type_name2, expected)
+        self.assertEqual(type_name2, type_name)
+
+    def test_make_type__with_cardinality_many0(self):
+        expected = "Number*"
+        type_name = CardinalityField.make_type("Number", Cardinality.many0)
+        self.assertEqual(type_name, expected)
+        self.assertTrue(CardinalityField.matches_type(type_name))
+
+        type_name2 = CardinalityField.make_type("Number", Cardinality.zero_or_more)
+        self.assertEqual(type_name2, expected)
+        self.assertEqual(type_name2, type_name)
+
+    def test_split_type2make_type__symmetry_with_valid_names(self):
+        for type_name in self.VALID_TYPE_NAMES:
+            primary_name, cardinality = CardinalityField.split_type(type_name)
+            type_name2 = CardinalityField.make_type(primary_name, cardinality)
+            self.assertEqual(type_name, type_name2)
+
+    def test_split_type2make_type__symmetry_with_cardinality_one(self):
+        for type_name in self.INVALID_TYPE_NAMES:
+            primary_name, cardinality = CardinalityField.split_type(type_name)
+            type_name2 = CardinalityField.make_type(primary_name, cardinality)
+            self.assertEqual(type_name, primary_name)
+            self.assertEqual(type_name, type_name2)
+            self.assertEqual(cardinality, Cardinality.one)
 
 # -------------------------------------------------------------------------
 # TEST CASE:
@@ -74,7 +147,7 @@ class TestCardinalityFieldTypeBuilder(CardinalityTypeBuilderTest):
     def generate_type_variants(self,type_name):
         for pattern_char in CardinalityField.pattern_chars:
             special_name = "%s%s" % (type_name.strip(), pattern_char)
-            self.assertTrue(CardinalityField.matches_type_name(special_name))
+            self.assertTrue(CardinalityField.matches_type(special_name))
             yield special_name
 
     # -- METHOD: CardinalityFieldTypeBuilder.create_type_variant()

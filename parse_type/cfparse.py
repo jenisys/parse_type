@@ -79,7 +79,6 @@ class Parser(parse.Parser):
         :param type_dict:  Type dictionary with type converters.
         :return: Generator with missing type names (as string).
         """
-        for type_name in FieldParser.extract_types(schema):
-            if (CardinalityField.matches_type_name(type_name) and
-                (type_name not in type_dict)):
-                    yield type_name
+        for name in FieldParser.extract_types(schema):
+            if CardinalityField.matches_type(name) and (name not in type_dict):
+                    yield name
