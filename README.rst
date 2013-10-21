@@ -37,15 +37,15 @@ with the following features:
 Definitions
 -------------------------------------------------------------------------------
 
-**type converter**
+*type converter*
     A type converter function that converts a textual representation
     of a value type into instance of this value type.
 
-**parse_type*
+*parse_type*
     A type converter function that is annotated with attributes
     that allows the `parse`_ module to process it as generic type.
 
-**cardinality field**
+*cardinality field*
 
     A naming convention for related types that differ in cardinality.
     A cardinality field is a type name suffix in the format of a field.
@@ -203,7 +203,7 @@ Example:
     # USE:  parse_number() type converter from above.
     from parse_type.cfparse import Parser
 
-    # -- PREPARE: parser.
+    # -- PREPARE: parser, adds missing type variant for cardinality 1..* (many)
     type_dict = dict(Number=parse_number)
     schema = "List: {numbers:Number+}"
     parser = Parser(schema, type_dict)
