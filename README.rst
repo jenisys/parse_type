@@ -113,7 +113,7 @@ Cardinality
     assert result.number == None
 
 
-Enumeration Type (Name-to-Value Mappings)
+Enumeration (Name-to-Value Mapping)
 -------------------------------------------------------------------------------
 
 .. code-block:: python
@@ -147,7 +147,7 @@ Enumeration Type (Name-to-Value Mappings)
     assert result.color is Color.red
 
 
-Choice (Name Enumerations)
+Choice (Name Enumeration)
 -------------------------------------------------------------------------------
 
 A Choice data type allows to select one of several strings.
