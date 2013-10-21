@@ -2,17 +2,19 @@
 parse_type
 ===============================================================================
 
-.. image:: https://pypip.in/v/parse_type/badge.png
-    :target: https://crate.io/packages/parse_type/
-    :alt: Latest PyPI version
+.. prepared:
 
-.. image:: https://pypip.in/d/parse_type/badge.png
-    :target: https://crate.io/packages/parse_type/
-    :alt: Number of PyPI downloads
+    .. image:: https://pypip.in/v/parse_type/badge.png
+        :target: https://crate.io/packages/parse_type/
+        :alt: Latest PyPI version
 
-.. image:: https://travis-ci.org/jenisys/parse_type.png?branch=master
-    :target: https://travis-ci.org/jenisys/parse_type
-    :alt: Travis CI Build Status
+    .. image:: https://pypip.in/d/parse_type/badge.png
+        :target: https://crate.io/packages/parse_type/
+        :alt: Number of PyPI downloads
+
+    .. image:: https://travis-ci.org/jenisys/parse_type.png?branch=master
+        :target: https://travis-ci.org/jenisys/parse_type
+        :alt: Travis CI Build Status
 
 
 `parse_type`_ extends the `parse`_ module (opposite of `string.format()`_)
@@ -22,6 +24,9 @@ with the following features:
     * build a parse_type with a cardinality constraint (0..1, 0..*, 1..*)
       from the parse_type for cardinality=1.
     * compose parse types from other parse types
+    * an extended parser that supports the CardinalityField naming schema
+      and creates missing type variants (0..1, 0..*, 1..*) from the
+      primary type converter
 
 
 .. _parse_type: http://pypi.python.org/pypi/parse_type
@@ -41,6 +46,19 @@ parse_type:
 
     A type converter function that is annotated with attributes
     that allows the `parse`_ module to process it as generic type.
+
+cardinality field:
+
+    A naming convention for related types that differ in cardinality.
+    A cardinality field is a type name suffix in the format of a field.
+    It allows parse format expression, ala:
+
+        "{person:Person}"     #< Cardinality: 1    (one; the normal case)
+        "{person:Person?}"    #< Cardinality: 0..1 (zero or one  = optional)
+        "{persons:Person*}"   #< Cardinality: 0..* (zero or more = many0)
+        "{persons:Person+}"   #< Cardinality: 1..* (one  or more = many)
+
+    This naming convention mimics the relationship descriptions in UML diagrams.
 
 
 Basic Example
@@ -163,3 +181,32 @@ A Choice data type allows to select one of several strings.
     result = parser.parse("Answer: yes")
     assert result.answer == "yes"
 
+
+Extended Parser with CardinalityField support
+-------------------------------------------------------------------------------
+
+The parser extends the ``parse.Parser`` and adds the following functionality:
+
+   * supports the CardinalityField naming scheme
+   * automatically creates missing type variants for types with
+     a CardinalityField by using the primary type converter for cardinality=1
+   * extends the provide type converter dictionary with new type variants.
+
+Example:
+
+.. code-block:: python
+
+    # -- USE CASE: Parser with CardinalityField support.
+    # NOTE: Automatically adds missing type variants with CardinalityField part.
+    # USE:  parse_number() type converter from above.
+    from parse_type.cfparse import Parser
+
+    # -- PREPARE: parser.
+    type_dict = dict(Number=parse_number)
+    schema = "List: {numbers:Number+}"
+    parser = Parser(schema, type_dict)
+    assert "Number+" in type_dict, "Created missing type variant based on: Number"
+
+    # -- USE: parser.
+    result = parser.parse("List: 1, 2, 3")
+    assert result.numbers == [1, 2, 3]
