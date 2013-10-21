@@ -123,7 +123,7 @@ if __name__ == '__main__':
     unittest.main()
 
 
-# Copyright (c) 2012 by Jens Engel (https://github/jenisys/)
+# Copyright (c) 2012-2013 by Jens Engel (https://github/jenisys/parse_type)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal

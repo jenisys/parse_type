@@ -106,13 +106,18 @@ class TestCardinality(ParseTypeTestCase):
 
 
 # -----------------------------------------------------------------------------
-# TEST CASE: TestTypeBuilder4Cardinality
+# TEST CASE: CardinalityTypeBuilderTest
 # -----------------------------------------------------------------------------
-class TestTypeBuilder4Cardinality(ParseTypeTestCase):
+class CardinalityTypeBuilderTest(ParseTypeTestCase):
 
-    def check_parse_number_with_zero_or_one(self, parse_xxx):
-        schema = "Optional: {number:OptionalNumber}"
-        parser = parse.Parser(schema, dict(OptionalNumber=parse_xxx))
+    def check_parse_number_with_zero_or_one(self, parse_candidate,
+                                            type_name="OptionalNumber"):
+        schema = "Optional: {number:%s}" % type_name
+        type_dict = {
+            "Number":  parse_number,
+            type_name: parse_candidate,
+        }
+        parser = parse.Parser(schema, type_dict)
 
         # -- PERFORM TESTS:
         self.assert_match(parser, "Optional: ",   "number", None)
@@ -124,12 +129,17 @@ class TestTypeBuilder4Cardinality(ParseTypeTestCase):
         self.assert_mismatch(parser, "Optional: -1",  "number")  # Negative.
         self.assert_mismatch(parser, "Optional: a, b", "number") # List of ...
 
-    def check_parse_number_with_optional(self, parse_xxx):
-        self.check_parse_number_with_zero_or_one(parse_xxx)
+    def check_parse_number_with_optional(self, parse_candidate,
+                                         type_name="OptionalNumber"):
+        self.check_parse_number_with_zero_or_one(parse_candidate, type_name)
 
-    def check_parse_number_with_zero_or_more(self, parse_xxx):
-        schema = "List: {numbers:Numbers0}"
-        parser = parse.Parser(schema, dict(Numbers0=parse_xxx))
+    def check_parse_number_with_zero_or_more(self, parse_candidate,
+                                             type_name="Numbers0"):
+        schema = "List: {numbers:%s}" % type_name
+        type_dict = {
+            type_name: parse_candidate,
+        }
+        parser = parse.Parser(schema, type_dict)
 
         # -- PERFORM TESTS:
         self.assert_match(parser, "List: ",        "numbers", [ ])
@@ -143,9 +153,14 @@ class TestTypeBuilder4Cardinality(ParseTypeTestCase):
         self.assert_mismatch(parser, "List: 1,", "numbers")  # Trailing sep.
         self.assert_mismatch(parser, "List: a, b", "numbers") # List of ...
 
-    def check_parse_number_with_one_or_more(self, parse_xxx):
-        schema = "List: {numbers:Numbers}"
-        parser = parse.Parser(schema, dict(Numbers=parse_xxx))
+    def check_parse_number_with_one_or_more(self, parse_candidate,
+                                            type_name="Numbers"):
+        schema = "List: {numbers:%s}" % type_name
+        type_dict = {
+            "Number":  parse_number,
+            type_name: parse_candidate,
+        }
+        parser = parse.Parser(schema, type_dict)
 
         # -- PERFORM TESTS:
         self.assert_match(parser, "List: 1",       "numbers", [ 1 ])
@@ -159,35 +174,64 @@ class TestTypeBuilder4Cardinality(ParseTypeTestCase):
         self.assert_mismatch(parser, "List: 1,", "numbers")  # Trailing sep.
         self.assert_mismatch(parser, "List: a, b", "numbers") # List of ...
 
-    def check_parse_number_with_many(self, parse_xxx):
-        self.check_parse_number_with_one_or_more(parse_xxx)
+    def check_parse_choice_with_optional(self, parse_candidate):
+        # Choice (["red", "green", "blue"])
+        schema = "Optional: {color:OptionalChoiceColor}"
+        parser = parse.Parser(schema, dict(OptionalChoiceColor=parse_candidate))
 
-    def check_parse_number_with_many0(self, parse_xxx):
-        self.check_parse_number_with_zero_or_more(parse_xxx)
+        # -- PERFORM TESTS:
+        self.assert_match(parser, "Optional: ",      "color", None)
+        self.assert_match(parser, "Optional: red",   "color", "red")
+        self.assert_match(parser, "Optional: green", "color", "green")
+        self.assert_match(parser, "Optional: blue",  "color", "blue")
+
+        # -- PARSE MISMATCH:
+        self.assert_mismatch(parser, "Optional: r",    "color")  # Not a Color.
+        self.assert_mismatch(parser, "Optional: redx", "color")  # Similar.
+        self.assert_mismatch(parser, "Optional: red, blue", "color") # List of ...
+
+
+    def check_parse_number_with_many(self, parse_candidate, type_name="Numbers"):
+        self.check_parse_number_with_one_or_more(parse_candidate, type_name)
+
+    def check_parse_number_with_many0(self, parse_candidate,
+                                      type_name="Numbers0"):
+        self.check_parse_number_with_zero_or_more(parse_candidate, type_name)
+
+
+# -----------------------------------------------------------------------------
+# TEST CASE: TestTypeBuilder4Cardinality
+# -----------------------------------------------------------------------------
+class TestTypeBuilder4Cardinality(CardinalityTypeBuilderTest):
 
     def test_with_zero_or_one_basics(self):
         parse_opt_number = TypeBuilder.with_zero_or_one(parse_number)
         self.assertEqual(parse_opt_number.pattern, r"(\d+)?")
 
-    def test_with_zero_or_one(self):
+    def test_with_zero_or_one__number(self):
         parse_opt_number = TypeBuilder.with_zero_or_one(parse_number)
         self.check_parse_number_with_zero_or_one(parse_opt_number)
 
-
-    def test_with_optional(self):
+    def test_with_optional__number(self):
         # -- ALIAS FOR: zero_or_one
         parse_opt_number = TypeBuilder.with_optional(parse_number)
         self.check_parse_number_with_optional(parse_opt_number)
+
+    def test_with_optional__choice(self):
+        # -- ALIAS FOR: zero_or_one
+        parse_color = TypeBuilder.make_choice(["red", "green", "blue"])
+        parse_opt_color = TypeBuilder.with_optional(parse_color)
+        self.check_parse_choice_with_optional(parse_opt_color)
 
     def test_with_zero_or_more_basics(self):
         parse_numbers = TypeBuilder.with_zero_or_more(parse_number)
         self.assertEqual(parse_numbers.pattern, r"(\d+)?(\s*,\s*(\d+))*")
 
-    def test_with_zero_or_more(self):
+    def test_with_zero_or_more__number(self):
         parse_numbers = TypeBuilder.with_zero_or_more(parse_number)
         self.check_parse_number_with_zero_or_more(parse_numbers)
 
-    def test_with_zero_or_more_choice(self):
+    def test_with_zero_or_more__choice(self):
         parse_color  = TypeBuilder.make_choice(["red", "green", "blue"])
         parse_colors = TypeBuilder.with_zero_or_more(parse_color)
         parse_colors.name = "Colors0"
@@ -373,7 +417,7 @@ if __name__ == '__main__':
     unittest.main()
 
 
-# Copyright (c) 2012-2013 by Jens Engel (https://github/jenisys/)
+# Copyright (c) 2012-2013 by Jens Engel (https://github/jenisys/parse_type)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal

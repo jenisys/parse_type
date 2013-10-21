@@ -111,10 +111,15 @@ class TestTypeBuilder4Enum(ParseTypeTestCase):
 # -----------------------------------------------------------------------------
 class TestTypeBuilder4Choice(ParseTypeTestCase):
 
-    def ensure_can_parse_all_choices(self, parser, type_converter, schema, name):
+    def ensure_can_parse_all_choices(self, parser, type_converter, schema,
+                                     name, transform=None):
         for choice_value in type_converter.choices:
             text = schema % choice_value
-            self.assert_match(parser, text, name,  choice_value)
+            expected_value = choice_value
+            if transform:
+                assert callable(transform)
+                expected_value = transform(choice_value)
+            self.assert_match(parser, text, name,  expected_value)
 
     def ensure_can_parse_all_choices2(self, parser, type_converter, schema, name):
         for index, choice_value in enumerate(type_converter.choices):
@@ -158,8 +163,77 @@ class TestTypeBuilder4Choice(ParseTypeTestCase):
         self.assert_mismatch(parser, "Answer: one ",    "answer")
         self.assert_mismatch(parser, "Answer: one ZZZ", "answer")
 
+    def test_make_choice__anycase_accepted_case_sensitity(self):
+        # -- NOTE: strict=False => Disable errors due to case-mismatch.
+        parse_choice = TypeBuilder.make_choice(["one", "two", "three"],
+                                               strict=False)
+        schema = "Answer: {answer:NumberWordChoice}"
+        parser = parse.Parser(schema, dict(NumberWordChoice=parse_choice))
+
+        # -- PERFORM TESTS:
+        # NOTE: Parser uses re.IGNORECASE flag => Any case accepted.
+        self.assert_match(parser, "Answer: one",   "answer", "one")
+        self.assert_match(parser, "Answer: TWO",   "answer", "TWO")
+        self.assert_match(parser, "Answer: Three", "answer", "Three")
+
+    def test_make_choice__samecase_match_or_error(self):
+        # -- NOTE: strict=True => Enable errors due to case-mismatch.
+        parse_choice = TypeBuilder.make_choice(["One", "TWO", "three"],
+                                               strict=True)
+        schema = "Answer: {answer:NumberWordChoice}"
+        parser = parse.Parser(schema, dict(NumberWordChoice=parse_choice))
+
+        # -- PERFORM TESTS: Case matches.
+        # NOTE: Parser uses re.IGNORECASE flag => Any case accepted.
+        self.assert_match(parser, "Answer: One",   "answer", "One")
+        self.assert_match(parser, "Answer: TWO",   "answer", "TWO")
+        self.assert_match(parser, "Answer: three", "answer", "three")
+
+        # -- PERFORM TESTS: EXACT-CASE MISMATCH
+        case_mismatch_input_data = ["one", "ONE", "Two", "two", "Three" ]
+        for input_value in case_mismatch_input_data:
+            input_text = "Answer: %s" % input_value
+            with self.assertRaises(ValueError):
+                parser.parse(input_text)
+
+    def test_make_choice__anycase_accepted_lowercase_enforced(self):
+        # -- NOTE: strict=True => Enable errors due to case-mismatch.
+        parse_choice = TypeBuilder.make_choice(["one", "two", "three"],
+                            transform=lambda x: x.lower(), strict=True)
+        schema = "Answer: {answer:NumberWordChoice}"
+        parser = parse.Parser(schema, dict(NumberWordChoice=parse_choice))
+
+        # -- PERFORM TESTS:
+        # NOTE: Parser uses re.IGNORECASE flag
+        # => Any case accepted, but result is in lower case.
+        self.assert_match(parser, "Answer: one",   "answer", "one")
+        self.assert_match(parser, "Answer: TWO",   "answer", "two")
+        self.assert_match(parser, "Answer: Three", "answer", "three")
+
+    def test_make_choice__with_transform(self):
+        transform = lambda x: x.upper()
+        parse_choice = TypeBuilder.make_choice(["ONE", "two", "Three"],
+                                               transform)
+        self.assertSequenceEqual(parse_choice.choices, ["ONE", "TWO", "THREE"])
+        schema = "Answer: {answer:NumberWordChoice}"
+        parser = parse.Parser(schema, dict(NumberWordChoice=parse_choice))
+
+        # -- PERFORM TESTS:
+        self.assert_match(parser, "Answer: one", "answer", "ONE")
+        self.assert_match(parser, "Answer: two", "answer", "TWO")
+        self.ensure_can_parse_all_choices(parser,
+                    parse_choice, "Answer: %s", "answer",
+                    transform=transform)
+
+        # -- PARSE MISMATCH:
+        self.assert_mismatch(parser, "Answer: __one__", "answer")
+        self.assert_mismatch(parser, "Answer: one ",    "answer")
+        self.assert_mismatch(parser, "Answer: one ZZZ", "answer")
+
     def test_make_choice2(self):
-        parse_choice2 = TypeBuilder.make_choice2(["zero", "one", "two"])
+        # -- strict=False: Disable errors due to case mismatch.
+        parse_choice2 = TypeBuilder.make_choice2(["zero", "one", "two"],
+                                                 strict=False)
         parse_choice2.name = "NumberWordChoice2"
         extra_types = build_type_dict([ parse_choice2 ])
         schema = "Answer: {answer:NumberWordChoice2}"
@@ -176,6 +250,40 @@ class TestTypeBuilder4Choice(ParseTypeTestCase):
         self.assert_mismatch(parser, "Answer: __one__", "answer")
         self.assert_mismatch(parser, "Answer: one ",    "answer")
         self.assert_mismatch(parser, "Answer: one ZZZ", "answer")
+
+    def test_make_choice2__with_transform(self):
+        transform = lambda x: x.lower()
+        parse_choice2 = TypeBuilder.make_choice2(["ZERO", "one", "Two"],
+                                        transform=transform)
+        self.assertSequenceEqual(parse_choice2.choices, ["zero", "one", "two"])
+        schema = "Answer: {answer:NumberWordChoice}"
+        parser = parse.Parser(schema, dict(NumberWordChoice=parse_choice2))
+
+        # -- PERFORM TESTS:
+        # NOTE: Parser uses re.IGNORECASE => Any case is accepted.
+        self.assert_match(parser, "Answer: zERO", "answer", (0, "zero"))
+        self.assert_match(parser, "Answer: ONE", "answer",  (1, "one"))
+        self.assert_match(parser, "Answer: Two", "answer",  (2, "two"))
+
+    def test_make_choice2__samecase_match_or_error(self):
+        # -- NOTE: strict=True => Enable errors due to case-mismatch.
+        parse_choice2 = TypeBuilder.make_choice2(["Zero", "one", "TWO"],
+                                                 strict=True)
+        schema = "Answer: {answer:NumberWordChoice}"
+        parser = parse.Parser(schema, dict(NumberWordChoice=parse_choice2))
+
+        # -- PERFORM TESTS: Case matches.
+        # NOTE: Parser uses re.IGNORECASE flag => Any case accepted.
+        self.assert_match(parser, "Answer: Zero", "answer", (0, "Zero"))
+        self.assert_match(parser, "Answer: one",  "answer", (1, "one"))
+        self.assert_match(parser, "Answer: TWO",  "answer", (2, "TWO"))
+
+        # -- PERFORM TESTS: EXACT-CASE MISMATCH
+        case_mismatch_input_data = ["zero", "ZERO", "One", "ONE", "two" ]
+        for input_value in case_mismatch_input_data:
+            input_text = "Answer: %s" % input_value
+            with self.assertRaises(ValueError):
+                parser.parse(input_text)
 
 # -----------------------------------------------------------------------------
 # MAIN:

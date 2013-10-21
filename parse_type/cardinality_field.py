@@ -48,6 +48,16 @@ class CardinalityField(object):
         """
         return type_name and type_name[-1] in CardinalityField.pattern_chars
 
+    @classmethod
+    def type_basename(cls, type_name):
+        """
+        Extracts the underlying type
+        """
+        if cls.matches_type_name(type_name):
+            return type_name[:-1]
+        else:
+            # -- ASSUME: Cardinality.one
+            return type_name
 
 # -----------------------------------------------------------------------------
 # CLASS: CardinalityFieldTypeBuilder
@@ -85,17 +95,16 @@ class CardinalityFieldTypeBuilder(object):
         :param type_name:  Type name with cardinality field suffix.
         :param type_converter:  Type converter or type dictionary.
         :return: Type converter variant (function).
-        :raises: AttributeError, if type_name does not end with CardinalityField
+        :raises: ValueError, if type_name does not end with CardinalityField
         :raises: MissingTypeError, if type_converter is missing in type_dict
         """
         assert isinstance(type_name, str)
-        assert type_name
-        cardinality_char = type_name[-1]
-        cardinality = CardinalityField.from_char_map.get(cardinality_char, None)
-        if not cardinality:
-            raise AttributeError("type_name='%s' has no CardinalityField" % \
-                                 type_name)
+        if not CardinalityField.matches_type_name(type_name):
+            message = "type_name='%s' has no CardinalityField" % type_name
+            raise ValueError(message)
 
+        cardinality_char = type_name[-1]
+        cardinality = CardinalityField.from_char_map[cardinality_char]
         if isinstance(type_converter, dict):
             type_dict = type_converter
             type_name_one = type_name[:-1]

@@ -76,6 +76,7 @@ class TypeBuilder(CardinalityTypeBuilder):
     the :mod:`parse` module.
     """
     default_pattern = r".+?"
+    default_strict = True
 
     @staticmethod
     def make_enum(enum_mappings):
@@ -99,43 +100,66 @@ class TypeBuilder(CardinalityTypeBuilder):
         return parse_enum
 
     @staticmethod
-    def make_choice(choices, value_converter=None):
+    def _normalize_choices(choices, transform):
+        assert transform is None or callable(transform)
+        if transform:
+            choices = [transform(value)  for value in choices]
+        else:
+            choices = list(choices)
+        return choices
+
+    @classmethod
+    def make_choice(cls, choices, transform=None, strict=None):
         """
         Creates a type-converter function to select one from a list of strings.
         The type-converter function returns the selected choice_text.
+        The :param:`transform()` function is applied in the type converter.
+        It can be used to enforce the case (because parser uses re.IGNORECASE).
 
         :param choices: List of strings as choice.
-        :param value_converter: Optional converter for selected string value.
+        :param transform: Optional, initial transform function for parsed text.
         :return: Type-converter (parse_choice) function object.
         """
-        assert value_converter is None or callable(value_converter)
-        choices = list(choices)
+        # -- NOTE: Parser uses re.IGNORECASE flag
+        #    => transform may enforce case.
+        choices = cls._normalize_choices(choices, transform)
+        if strict is None:
+            strict = cls.default_strict
+
         def parse_choice(text):
-            assert text in parse_choice.choices
-            # text = text.strip()
-            if value_converter:
-                return value_converter(text)
+            if transform:
+                text = transform(text)
+            if strict and not (text in parse_choice.choices):
+                values = ", ".join(parse_choice.choices)
+                raise ValueError("%s not in: %s" % (text, values))
             return text
         parse_choice.pattern = r"|".join(choices)
         parse_choice.choices = choices
         return parse_choice
 
-    @staticmethod
-    def make_choice2(choices):
+    @classmethod
+    def make_choice2(cls, choices, transform=None, strict=None):
         """
         Creates a type-converter function to select one from a list of strings.
         The type-converter function returns a tuple (index, choice_text).
 
         :param choices: List of strings as choice.
-        :param value_converter: Optional converter for selected string value.
+        :param transform: Optional, initial transform function for parsed text.
         :return: Type-converter (parse_choice) function object.
         """
-        choices = list(choices)
+        choices = cls._normalize_choices(choices, transform)
+        if strict is None:
+            strict = cls.default_strict
+
         def parse_choice2(text):
-            assert text in parse_choice2.choices
-            # text = text.strip()
-            if not text:
-                return None #< OPTIONAL CASE OCCURED.
+            if transform:
+                text = transform(text)
+            if strict and not (text in parse_choice2.choices):
+                values = ", ".join(parse_choice2.choices)
+                raise ValueError("%s not in: %s" % (text, values))
+            # XXX-JE-UNCLEAR-WHY-NEEDED:
+            #if not text:
+            #    return None #< OPTIONAL CASE OCCURED.
             index = parse_choice2.choices.index(text)
             return index, text
         parse_choice2.pattern = r"|".join(choices)
