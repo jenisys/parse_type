@@ -60,29 +60,6 @@ class Cardinality(Enum):
 
 
 # -----------------------------------------------------------------------------
-# CLASS: Cardinality (Field Part)
-# -----------------------------------------------------------------------------
-class CardinalityField(object):
-    """
-    Cardinality field for parse format expression, ala:
-
-        "... {person:Person?} ..."   -- OPTIONAL: Cardinality zero or one, 0..1
-        "... {persons:Person*} ..."  -- MANY0: Cardinality zero or more, 0..
-        "... {persons:Person+} ..."  -- MANY:  Cardinality one  or more, 1..
-
-    STATUS: IDEA, currently not accepted in :mod:`parse` module.
-    """
-
-    # -- MAPPING SUPPORT:
-    pattern_chars = "?*+"
-    from_char_map = {
-        '?': Cardinality.zero_or_one,
-        '*': Cardinality.zero_or_more,
-        '+': Cardinality.one_or_more,
-    }
-    to_char_map = dict([(value, key)  for key, value in from_char_map.items()])
-
-# -----------------------------------------------------------------------------
 # CLASS: TypeBuilder
 # -----------------------------------------------------------------------------
 class TypeBuilder(object):
@@ -141,8 +118,8 @@ class TypeBuilder(object):
                 text = text.strip()
             if not text:
                 return []
-            parts = [ parse_type(texti.strip())
-                      for texti in text.split(listsep) ]
+            parts = [ parse_type(part.strip())
+                      for part in text.split(listsep) ]
             return parts
         pattern  = getattr(parse_type, "pattern", cls.default_pattern)
         list_pattern = Cardinality.zero_or_more.make_pattern(pattern, listsep)
@@ -162,8 +139,8 @@ class TypeBuilder(object):
         :return: type-converter for list<T>
         """
         def parse_list(text, m=None):
-            parts = [ parse_type(text.strip())
-                      for text in text.split(listsep) ]
+            parts = [ parse_type(part.strip())
+                      for part in text.split(listsep) ]
             return parts
         pattern = getattr(parse_type, "pattern", cls.default_pattern)
         list_pattern = Cardinality.one_or_more.make_pattern(pattern, listsep)
@@ -188,49 +165,49 @@ class TypeBuilder(object):
         return cls.with_zero_or_more(parse_type, **kwargs)
 
 
-    @classmethod
-    def make_cardinality_variants(cls, parse_type, name=None,
-                                        cardinalities=None, listsep=','):
-        """
-        Creates type variants for a parse_type with Cardinality.one.
-        Uses the CardinalityField name convention for the created type variants:
-
-          * "Number"  (Cardinality.one)
-          * "Number?" (Cardinality.zero_or_one = Cardinality.optional)
-          * "Number*" (Cardinality.zero_or_more)
-          * "Number+" (Cardinality.one_or_more = Cardinality.many)
-
-        .. code-block::
-
-            # Create all cardinality type variants for the type Number.
-            # Creates: "Number?" (0..1), "Number*" (0..*), "Number+" (1..*)
-            types = TypeBuilder.make_cardinality_variants(parse_number,
-                            "Number", CardinalityField.pattern_chars)
-            types = TypeBuilder.make_cardinality_variants(parse_number,
-                            "Number", [Cardinality.optional, Cardinality.many])
-
-        :param parse_type:  Type converter for Cardinality.one.
-        :param name:        Optional name (as string or None).
-        :param cardinalities:  List of cardinalities or CardinalityField chars.
-        :param listsep:     List separator to use (as string).
-        :return: List of created parse_type variants.
-        """
-        assert callable(parse_type)
-        if not name:
-            name = parse_type.name
-        if cardinalities is None:
-            cardinalities = CardinalityField.pattern_chars
-
-        type_list = []
-        for cardinality in cardinalities:
-            if isinstance(cardinality, str):
-                cardinality_char = cardinality
-                cardinality = CardinalityField.from_char_map[cardinality_char]
-            else:
-                cardinality_char = CardinalityField.to_char_map[cardinality]
-
-            type_variant = cls.with_cardinality(cardinality, parse_type, listsep)
-            type_variant.name = name + cardinality_char
-            type_list.append(type_variant)
-        return type_list
+    #@classmethod
+    #def make_cardinality_variants(cls, parse_type, name=None,
+    #                                    cardinalities=None, listsep=','):
+    #    """
+    #    Creates type variants for a parse_type with Cardinality.one.
+    #    Uses the CardinalityField name convention for the created type variants:
+    #
+    #      * "Number"  (Cardinality.one)
+    #      * "Number?" (Cardinality.zero_or_one = Cardinality.optional)
+    #      * "Number*" (Cardinality.zero_or_more)
+    #      * "Number+" (Cardinality.one_or_more = Cardinality.many)
+    #
+    #    .. code-block::
+    #
+    #        # Create all cardinality type variants for the type Number.
+    #        # Creates: "Number?" (0..1), "Number*" (0..*), "Number+" (1..*)
+    #        types = TypeBuilder.make_cardinality_variants(parse_number,
+    #                        "Number", CardinalityField.pattern_chars)
+    #        types = TypeBuilder.make_cardinality_variants(parse_number,
+    #                        "Number", [Cardinality.optional, Cardinality.many])
+    #
+    #    :param parse_type:  Type converter for Cardinality.one.
+    #    :param name:        Optional name (as string or None).
+    #    :param cardinalities:  List of cardinalities or CardinalityField chars.
+    #    :param listsep:     List separator to use (as string).
+    #    :return: List of created parse_type variants.
+    #    """
+    #    assert callable(parse_type)
+    #    if not name:
+    #        name = parse_type.name
+    #    if cardinalities is None:
+    #        cardinalities = CardinalityField.pattern_chars
+    #
+    #    type_list = []
+    #    for cardinality in cardinalities:
+    #        if isinstance(cardinality, str):
+    #            cardinality_char = cardinality
+    #            cardinality = CardinalityField.from_char_map[cardinality_char]
+    #        else:
+    #            cardinality_char = CardinalityField.to_char_map[cardinality]
+    #
+    #        type_variant = cls.with_cardinality(cardinality, parse_type, listsep)
+    #        type_variant.name = name + cardinality_char
+    #        type_list.append(type_variant)
+    #    return type_list
 

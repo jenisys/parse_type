@@ -5,7 +5,7 @@ Test suite to test the :mod:`parse_type.cardinality` module.
 """
 
 from .parse_type_test import ParseTypeTestCase, parse_number
-from parse_type import Cardinality, CardinalityField, TypeBuilder, build_type_dict
+from parse_type import Cardinality, TypeBuilder, build_type_dict
 import parse
 import unittest
 
@@ -322,48 +322,48 @@ class TestTypeBuilder4Cardinality(ParseTypeTestCase):
                 Cardinality.many, parse_number)
         self.check_parse_number_with_many(parse_many_numbers)
 
-    def check_cardinality_type_variant(self, parse_type, type_variant, cardinality):
-        # -- ENSURE: Genrated type name uses CardinalityField name conventions
-        cardinality_char = CardinalityField.to_char_map[cardinality]
-        self.assertEqual(type_variant.name, parse_type.name + cardinality_char)
-
-        # -- Select specific checker to ensure that type variant is usable.
-        checker = getattr(self, "check_parse_number_with_%s" % cardinality.name)
-        checker(type_variant)
-
-    def test_make_cardinality_variants_with_defaults(self):
-        parse_number.name = "Number"
-        type_list = TypeBuilder.make_cardinality_variants(parse_number)
-
-        self.assertEqual(len(type_list), 3)
-        for parse_variant, cardinality_char in zip(type_list, CardinalityField.pattern_chars):
-            cardinality = CardinalityField.from_char_map[cardinality_char]
-            self.check_cardinality_type_variant(
-                    parse_number, parse_variant, cardinality)
-
-    def test_make_cardinality_variants_with_pattern_chars(self):
-        for cardinality_char in CardinalityField.pattern_chars:
-            parse_number.name = "Number"
-            type_list = TypeBuilder.make_cardinality_variants(
-                    parse_number, "Number2", cardinality_char)
-
-            self.assertEqual(len(type_list), 1)
-            parse_number.name = "Number2"
-            for parse_variant in type_list:
-                cardinality = CardinalityField.from_char_map[cardinality_char]
-                self.check_cardinality_type_variant(
-                    parse_number, parse_variant, cardinality)
-
-    def test_make_cardinality_variants_with_cardinalities(self):
-        parse_number.name = "Number3"
-        cardinalities = [Cardinality.optional, Cardinality.many]
-        type_list = TypeBuilder.make_cardinality_variants(
-                parse_number, "Number3", cardinalities)
-
-        self.assertEqual(len(type_list), len(cardinalities))
-        for parse_variant, cardinality in zip(type_list, cardinalities):
-            self.check_cardinality_type_variant(
-                    parse_number, parse_variant, cardinality)
+    #def check_cardinality_type_variant(self, parse_type, type_variant, cardinality):
+    #    # -- ENSURE: Genrated type name uses CardinalityField name conventions
+    #    cardinality_char = CardinalityField.to_char_map[cardinality]
+    #    self.assertEqual(type_variant.name, parse_type.name + cardinality_char)
+    #
+    #    # -- Select specific checker to ensure that type variant is usable.
+    #    checker = getattr(self, "check_parse_number_with_%s" % cardinality.name)
+    #    checker(type_variant)
+    #
+    #def test_make_cardinality_variants_with_defaults(self):
+    #    parse_number.name = "Number"
+    #    type_list = TypeBuilder.make_cardinality_variants(parse_number)
+    #
+    #    self.assertEqual(len(type_list), 3)
+    #    for parse_variant, cardinality_char in zip(type_list, CardinalityField.pattern_chars):
+    #        cardinality = CardinalityField.from_char_map[cardinality_char]
+    #        self.check_cardinality_type_variant(
+    #                parse_number, parse_variant, cardinality)
+    #
+    #def test_make_cardinality_variants_with_pattern_chars(self):
+    #    for cardinality_char in CardinalityField.pattern_chars:
+    #        parse_number.name = "Number"
+    #        type_list = TypeBuilder.make_cardinality_variants(
+    #                parse_number, "Number2", cardinality_char)
+    #
+    #        self.assertEqual(len(type_list), 1)
+    #        parse_number.name = "Number2"
+    #        for parse_variant in type_list:
+    #            cardinality = CardinalityField.from_char_map[cardinality_char]
+    #            self.check_cardinality_type_variant(
+    #                parse_number, parse_variant, cardinality)
+    #
+    #def test_make_cardinality_variants_with_cardinalities(self):
+    #    parse_number.name = "Number3"
+    #    cardinalities = [Cardinality.optional, Cardinality.many]
+    #    type_list = TypeBuilder.make_cardinality_variants(
+    #            parse_number, "Number3", cardinalities)
+    #
+    #    self.assertEqual(len(type_list), len(cardinalities))
+    #    for parse_variant, cardinality in zip(type_list, cardinalities):
+    #        self.check_cardinality_type_variant(
+    #                parse_number, parse_variant, cardinality)
 
 
 # -----------------------------------------------------------------------------

@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from parse_type import TypeBuilder
-import unittest
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
+
 
 # -----------------------------------------------------------------------------
 # TEST SUPPORT FOR: TypeBuilder Tests
@@ -26,12 +30,9 @@ parse_person_choice.name = "PersonChoice"      # For testing only.
 
 
 # -----------------------------------------------------------------------------
-# ABSTRACT TEST CASE: TestParseType
+# ABSTRACT TEST CASE:
 # -----------------------------------------------------------------------------
-class ParseTypeTestCase(unittest.TestCase):
-    """
-    Common test case base class for :mod:`parse_type` tests.
-    """
+class TestCase(unittest.TestCase):
 
     # -- PYTHON VERSION BACKWARD-COMPATIBILTY:
     if not hasattr(unittest.TestCase, "assertIsNone"):
@@ -40,6 +41,12 @@ class ParseTypeTestCase(unittest.TestCase):
 
         def assertIsNotNone(self, obj, msg=None):
             self.assert_(obj is not None, msg)
+
+
+class ParseTypeTestCase(TestCase):
+    """
+    Common test case base class for :mod:`parse_type` tests.
+    """
 
     #@staticmethod
     #def build_type_dict(type_converters):
@@ -69,7 +76,7 @@ class ParseTypeTestCase(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result[param_name], expected)
 
-    def assert_mismatch(self, parser, text, param_name):
+    def assert_mismatch(self, parser, text, param_name=None):
         """
         Check that a parser cannot extract the parameter from the provided text.
         A parse mismatch has occured.

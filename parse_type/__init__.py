@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from parse_type.cardinality import Cardinality, CardinalityField
+from parse_type.cardinality import Cardinality
 from parse_type.builder import TypeBuilder, build_type_dict
 
 __all__ = ["Cardinality", "TypeBuilder", "build_type_dict"]
