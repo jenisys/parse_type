@@ -22,12 +22,11 @@ with the following features:
 
     * build parse_types for common use cases (enum/mapping, choice)
     * build a parse_type with a cardinality constraint (0..1, 0..*, 1..*)
-      from the parse_type for cardinality=1.
+      from the parse_type with cardinality=1.
     * compose parse types from other parse types
     * an extended parser that supports the CardinalityField naming schema
       and creates missing type variants (0..1, 0..*, 1..*) from the
       primary type converter
-
 
 .. _parse_type: http://pypi.python.org/pypi/parse_type
 .. _parse:      http://pypi.python.org/pypi/parse
@@ -95,13 +94,17 @@ This is equivalent to:
     result = parser.parse("Hello XXX")
     assert result is None, "MISMATCH: text does not match the schema."
 
-.. note::
+.. hint::
 
-    The described functionality above is already available in the `parse`_ module.
+    The described functionality above is standard functionality
+    of the `parse`_ module. It serves as introduction for the remaining cases.
 
 
 Cardinality
 -------------------------------------------------------------------------------
+
+Create an type converter for "ManyNumbers" (List, separated with commas)
+with cardinality "1..* = 1+" (many) from the type converter for a "Number".
 
 .. code-block:: python
 
@@ -115,6 +118,10 @@ Cardinality
     parser = Parser(schema, dict(ManyNumbers=parse_numbers))
     result = parser.parse("List: 1, 2, 3")
     assert result.numbers == [1, 2, 3]
+
+
+Create an type converter for an "OptionalNumbers" with cardinality "0..1 = ?"
+(optional) from the type converter for a "Number".
 
 .. code-block:: python
 
@@ -135,6 +142,9 @@ Cardinality
 Enumeration (Name-to-Value Mapping)
 -------------------------------------------------------------------------------
 
+Create an type converter for an "Enumeration" from the description of
+the mapping as dictionary.
+
 .. code-block:: python
 
     # -- USE CASE: Create an enumeration parse_type (name-to-value mapping).
@@ -146,6 +156,10 @@ Enumeration (Name-to-Value Mapping)
     result = parser.parse("Answer: yes")
     assert result.answer == True
 
+
+Create an type converter for an "Enumeration" from the description of
+the mapping as an enumeration class (`Python 3.4 enum`_ or the `enum34`_
+backport; see also: `PEP-0435`_).
 
 .. code-block:: python
 
@@ -165,11 +179,18 @@ Enumeration (Name-to-Value Mapping)
     result = parser.parse("Select: red")
     assert result.color is Color.red
 
+.. _`Python 3.4 enum`: http://docs.python.org/3.4/library/enum.html#module-enum
+.. _enum34:   http://pypi.python.org/pypi/enum34
+.. _PEP-0435: http://www.python.org/dev/peps/pep-0435
+
 
 Choice (Name Enumeration)
 -------------------------------------------------------------------------------
 
 A Choice data type allows to select one of several strings.
+
+Create an type converter for an "Choice" list, a list of unique names
+(as string).
 
 .. code-block:: python
 
