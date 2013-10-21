@@ -34,24 +34,22 @@ with the following features:
 .. _`string.format()`: http://docs.python.org/library/string.html#format-string-syntax
 
 
-CONCEPTS
+Definitions
 -------------------------------------------------------------------------------
 
-type converter:
-
+**type converter**
     A type converter function that converts a textual representation
     of a value type into instance of this value type.
 
-parse_type:
-
+**parse_type*
     A type converter function that is annotated with attributes
     that allows the `parse`_ module to process it as generic type.
 
-cardinality field:
+**cardinality field**
 
     A naming convention for related types that differ in cardinality.
     A cardinality field is a type name suffix in the format of a field.
-    It allows parse format expression, ala:
+    It allows parse format expression, ala::
 
         "{person:Person}"     #< Cardinality: 1    (one; the normal case)
         "{person:Person?}"    #< Cardinality: 0..1 (zero or one  = optional)
@@ -97,6 +95,10 @@ This is equivalent to:
 
     result = parser.parse("Hello XXX")
     assert result is None, "MISMATCH: text does not match the schema."
+
+.. note::
+
+    The described functionality above is already available in the `parse`_ module.
 
 
 Cardinality
