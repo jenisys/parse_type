@@ -46,7 +46,6 @@ Definitions
     that allows the `parse`_ module to process it as generic type.
 
 *cardinality field*
-
     A naming convention for related types that differ in cardinality.
     A cardinality field is a type name suffix in the format of a field.
     It allows parse format expression, ala::
