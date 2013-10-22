@@ -5,7 +5,7 @@ Provides generic utility classes for the :class:`parse.Parser` class.
 
 import parse
 from collections import namedtuple
-
+import six
 
 # -- HELPER-CLASS: For format part in a Field.
 # REQUIRES: Python 2.6 or newer.
@@ -61,7 +61,7 @@ class Field(object):
             format1 = self.format or ""
             format2 = other.format or ""
             return (self.name == other.name) and (format1 == format2)
-        elif isinstance(other, str):
+        elif isinstance(other, six.string_types):
             return str(self) == other
         else:
             raise ValueError(other)

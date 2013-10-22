@@ -36,7 +36,7 @@ from setuptools import setup, find_packages
 # -----------------------------------------------------------------------------
 python_version = float('%s.%s' % sys.version_info[:2])
 
-requirements = ["parse>=1.6"]
+requirements = ["parse>=1.6", "six"]
 if  python_version < 3.4:
     # -- NEED: Python3.4 enum types or enum34 backport
     requirements.append("enum34")
