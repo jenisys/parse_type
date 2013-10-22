@@ -3,10 +3,11 @@
 # ============================================================================
 
 # -- TESTING: Unit tests and behave self-tests.
-unittest2
+argparse
 pytest
 pytest-cov
 pytest-runner
+unittest2
 
 # -- DEVELOPMENT SUPPORT:
 # PREPARED: paver >= 1.2

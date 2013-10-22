@@ -10,3 +10,4 @@
 
 parse >= 1.6.3
 enum34
+six

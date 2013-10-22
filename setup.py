@@ -34,15 +34,17 @@ from setuptools import setup, find_packages
 # -----------------------------------------------------------------------------
 # PREPARE SETUP:
 # -----------------------------------------------------------------------------
+HERE = os.path.dirname(__file__)
 python_version = float('%s.%s' % sys.version_info[:2])
 
-requirements = ["parse>=1.6", "six"]
+requirements = ["parse>= 1.6", "six"]
+# requirements = ["parse", "six"]
 if  python_version < 3.4:
     # -- NEED: Python3.4 enum types or enum34 backport
     requirements.append("enum34")
 
-
-long_description = ''.join(open('README.rst').readlines()[4:])
+README = os.path.join(HERE, "README.rst")
+long_description = ''.join(open(README).readlines()[4:])
 extra = dict(
     # -- REQUIREMENTS:
     # setup_requires = ["setuptools>=1.0"],
@@ -91,6 +93,8 @@ setup(
     long_description = long_description,
     keywords= "parse, parsing",
     license = "BSD",
+    # provides = ["parse_type"],
+    # requires = requirements,
 
     packages = find_packages(exclude=["tests", "tests.*"]),
     include_package_data = True,

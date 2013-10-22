@@ -9,6 +9,7 @@ MANIFEST
 *.egg-info
 dist
 build
+downloads
 eggs
 parts
 bin
