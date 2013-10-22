@@ -43,7 +43,6 @@ if  python_version < 3.4:
 
 
 long_description = ''.join(open('README.rst').readlines()[4:])
-VERSION = open("VERSION.txt").read().strip()
 extra = dict(
     # -- REQUIREMENTS:
     # setup_requires = ["setuptools>=1.0"],
@@ -83,7 +82,7 @@ if USE_PYTEST_RUNNER:
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = VERSION,
+    version = "0.3.0",
     author = "Jens Engel",
     author_email = "jens_engel@nowhere.xxx",
     url = "https://github.com/jenisys/parse_type",
