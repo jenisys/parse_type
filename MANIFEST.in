@@ -1,0 +1,16 @@
+include README.rst
+include LICENSE
+include .coveragerc
+include .editorconfig
+include *.py
+include *.rst
+include *.txt
+include *.ini
+include *.cfg
+
+recursive-include docs          *.rst *.txt *.py
+recursive-include requirements  *.txt
+recursive-include tests         *.py
+
+prune .tox
+
