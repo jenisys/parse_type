@@ -16,18 +16,19 @@ RELATED:
   * https://pythonhosted.org/setuptools/setuptools.html
 """
 
-# -- BOOTSTRAP: setuptools
-use_setuptools_bootstrap = False
-if use_setuptools_bootstrap:
-    from ez_setup import use_setuptools
-    use_setuptools()
-
-# -- USE: setuptools
-from setuptools import setup, find_packages
-
 import sys
 import os.path
 sys.path.insert(0, os.curdir)
+
+# -- BOOTSTRAP: setuptools
+USE_BOOTSTRAP = os.environ.get("PYSETUP_BOOTSTRAP", "no") == "yes"
+if USE_BOOTSTRAP:
+    from ez_setup import use_setuptools
+    use_setuptools()
+
+
+# -- USE: setuptools
+from setuptools import setup, find_packages
 
 
 # -----------------------------------------------------------------------------
@@ -41,10 +42,11 @@ if  python_version < 3.4:
     requirements.append("enum34")
 
 
-long_description = ''.join(open('README.rst').readlines()[5:])
+long_description = ''.join(open('README.rst').readlines()[4:])
 VERSION = open("VERSION.txt").read().strip()
 extra = dict(
     # -- REQUIREMENTS:
+    # setup_requires = ["setuptools>=1.0"],
     install_requires = requirements,
     tests_require = [],
     extras_require = {
@@ -71,8 +73,8 @@ if python_version >= 3.0:
 # # FILE: setup.cfg -- Use pytest-runner (ptr) as test runner.
 # [aliases]
 # test = ptr
-use_pytest_runner = True
-if use_pytest_runner:
+USE_PYTEST_RUNNER = os.environ.get("PYSETUP_TEST", "pytest") == "pytest"
+if USE_PYTEST_RUNNER:
     extra["tests_require"].extend(["pytest", "pytest-runner"])
 
 

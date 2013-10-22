@@ -3,9 +3,9 @@
 Provides support for cardinality fields.
 A cardinality field is a type suffix for parse format expression, ala:
 
-    "... {person:Person?} ..."   -- OPTIONAL: Cardinality zero or one, 0..1
-    "... {persons:Person*} ..."  -- MANY0: Cardinality zero or more, 0..
-    "... {persons:Person+} ..."  -- MANY:  Cardinality one  or more, 1..
+    "{person:Person?}"   #< Cardinality: 0..1 = zero or one  = optional
+    "{persons:Person*}"  #< Cardinality: 0..* = zero or more = many0
+    "{persons:Person+}"  #< Cardinality: 1..* = one  or more = many
 """
 
 from __future__ import absolute_import
@@ -22,9 +22,9 @@ class CardinalityField(object):
     """
     Cardinality field for parse format expression, ala:
 
-        "... {person:Person?} ..."   -- OPTIONAL: Cardinality zero or one, 0..1
-        "... {persons:Person*} ..."  -- MANY0: Cardinality zero or more, 0..
-        "... {persons:Person+} ..."  -- MANY:  Cardinality one  or more, 1..
+        "{person:Person?}"   #< Cardinality: 0..1 = zero or one  = optional
+        "{persons:Person*}"  #< Cardinality: 0..* = zero or more = many0
+        "{persons:Person+}"  #< Cardinality: 1..* = one  or more = many
 
     STATUS: IDEA, currently not accepted in :mod:`parse` module.
     """
@@ -107,7 +107,7 @@ class CardinalityFieldTypeBuilder(object):
 
             import parse
 
-            @parse.with_pattern(r"\d+")
+            @parse.with_pattern(r'\d+')
             def parse_number(text):
                 return int(text)
 
@@ -150,12 +150,7 @@ class CardinalityFieldTypeBuilder(object):
 
         .. code-block:: python
 
-            import parse
-
-            @parse.with_pattern(r"\d+")
-            def parse_number(text):
-                return int(text)
-
+            # -- USE: parse_number() type converter function.
             new_types = CardinalityFieldTypeBuilder.create_type_variants(
                             ["Number?", "Number+"], dict(Number=parse_number))
 
