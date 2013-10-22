@@ -10,7 +10,7 @@ A cardinality field is a type suffix for parse format expression, ala:
 
 from __future__ import absolute_import
 from .cardinality import Cardinality, TypeBuilder
-
+import six
 
 class MissingTypeError(KeyError):
     pass
@@ -122,7 +122,7 @@ class CardinalityFieldTypeBuilder(object):
         :raises: ValueError, if type_name does not end with CardinalityField
         :raises: MissingTypeError, if type_converter is missing in type_dict
         """
-        assert isinstance(type_name, str)
+        assert isinstance(type_name, six.string_types)
         if not CardinalityField.matches_type(type_name):
             message = "type_name='%s' has no CardinalityField" % type_name
             raise ValueError(message)
