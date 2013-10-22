@@ -46,12 +46,12 @@ class TestParser(ParseTypeTestCase):
     def test_parser__can_parse_cardinality_field_optional(self):
         # -- CARDINALITY: 0..1 = zero_or_one = optional
         existing_types = dict(Number=parse_number)
-        self.assertFalse(existing_types.has_key("Number?"))
+        self.assertFalse("Number?" in existing_types)
 
         # -- ENSURE: Missing type variant is created.
         schema = "OptionalNumber: {number:Number?}"
         parser = Parser(schema, existing_types)
-        self.assertTrue(existing_types.has_key("Number?"))
+        self.assertTrue("Number?" in existing_types)
 
         # -- ENSURE: Newly created type variant is usable.
         self.assert_match(parser, "OptionalNumber: 42",  "number", 42)
@@ -64,12 +64,12 @@ class TestParser(ParseTypeTestCase):
     def test_parser__can_parse_cardinality_field_many(self):
         # -- CARDINALITY: 1..* = one_or_more = many
         existing_types = dict(Number=parse_number)
-        self.assertFalse(existing_types.has_key("Number+"))
+        self.assertFalse("Number+" in existing_types)
 
         # -- ENSURE: Missing type variant is created.
         schema = "List: {numbers:Number+}"
         parser = Parser(schema, existing_types)
-        self.assertTrue(existing_types.has_key("Number+"))
+        self.assertTrue("Number+" in existing_types)
 
         # -- ENSURE: Newly created type variant is usable.
         self.assert_match(parser, "List: 42",  "numbers", [42])
@@ -87,12 +87,12 @@ class TestParser(ParseTypeTestCase):
 
         type_builder = MyCardinalityFieldTypeBuilder
         existing_types = dict(Number=parse_number)
-        self.assertFalse(existing_types.has_key("Number+"))
+        self.assertFalse("Number+" in existing_types)
 
         # -- ENSURE: Missing type variant is created.
         schema = "List: {numbers:Number+}"
         parser = Parser(schema, existing_types, type_builder)
-        self.assertTrue(existing_types.has_key("Number+"))
+        self.assertTrue("Number+" in existing_types)
 
         # -- ENSURE: Newly created type variant is usable.
         # NOTE: Use other list separator.
@@ -107,12 +107,12 @@ class TestParser(ParseTypeTestCase):
     def test_parser__can_parse_cardinality_field_many0(self):
         # -- CARDINALITY: 0..* = zero_or_more = many0
         existing_types = dict(Number=parse_number)
-        self.assertFalse(existing_types.has_key("Number*"))
+        self.assertFalse("Number*" in existing_types)
 
         # -- ENSURE: Missing type variant is created.
         schema = "List0: {numbers:Number*}"
         parser = Parser(schema, existing_types)
-        self.assertTrue(existing_types.has_key("Number*"))
+        self.assertTrue("Number*" in existing_types)
 
         # -- ENSURE: Newly created type variant is usable.
         self.assert_match(parser, "List0: 42",  "numbers", [42])
