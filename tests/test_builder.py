@@ -7,7 +7,7 @@ REQUIRES: parse >= 1.5.3.1 ('pattern' attribute support)
 """
 
 from .parse_type_test import ParseTypeTestCase
-from .parse_type_test import parse_yesno, parse_person_choice
+from .parse_type_test import parse_yesno, parse_person_choice, parse_number
 from parse_type import TypeBuilder, build_type_dict
 from enum import Enum
 import parse
@@ -284,6 +284,77 @@ class TestTypeBuilder4Choice(ParseTypeTestCase):
             input_text = "Answer: %s" % input_value
             with self.assertRaises(ValueError):
                 parser.parse(input_text)
+
+# -----------------------------------------------------------------------------
+# TEST CASE: TestTypeBuilder4Variant
+# -----------------------------------------------------------------------------
+class TestTypeBuilder4Variant(ParseTypeTestCase):
+
+    TYPE_CONVERTERS = [ parse_yesno ]
+
+    def ensure_can_parse_all_enum_values(self, parser, type_converter,
+                                         schema, name):
+        # -- ENSURE: Known enum values are correctly extracted.
+        for value_name, value in type_converter.mappings.items():
+            text = schema % value_name
+            self.assert_match(parser, text, name,  value)
+
+    def test_parse_variant1(self):
+        type_converters = [parse_yesno, parse_number]
+        parse_variant1 = TypeBuilder.make_variant(type_converters)
+        schema = "Variant: {variant:YesNo_or_Number}"
+        parser = parse.Parser(schema, dict(YesNo_or_Number=parse_variant1))
+
+        # -- TYPE 1: YesNo
+        self.assert_match(parser, "Variant: yes", "variant", True)
+        self.assert_match(parser, "Variant: no",  "variant", False)
+        # -- IGNORECASE problem => re_opts
+        self.assert_match(parser, "Variant: YES", "variant", True)
+
+        # -- TYPE 2: Number
+        self.assert_match(parser, "Variant: 0",  "variant",  0)
+        self.assert_match(parser, "Variant: 1",  "variant",  1)
+        self.assert_match(parser, "Variant: 12", "variant", 12)
+        self.assert_match(parser, "Variant: 42", "variant", 42)
+
+        # -- PARSE MISMATCH:
+        self.assert_mismatch(parser, "Variant: __YES__")
+        self.assert_mismatch(parser, "Variant: yes ")
+        self.assert_mismatch(parser, "Variant: yes ZZZ")
+        self.assert_mismatch(parser, "Variant: -1")
+
+        # -- PERFORM TESTS:
+        self.ensure_can_parse_all_enum_values(parser,
+                    parse_yesno, "Variant: %s", "variant")
+
+    def test_parse_variant2(self):
+        # -- REVERSED ORDER VARIANT:
+        type_converters = [parse_number, parse_yesno]
+        parse_variant2 = TypeBuilder.make_variant(type_converters)
+        schema = "Variant: {variant:Number_or_YesNo}"
+        parser = parse.Parser(schema, dict(Number_or_YesNo=parse_variant2))
+
+        # -- TYPE 1: Number
+        self.assert_match(parser, "Variant: 0",  "variant",  0)
+        self.assert_match(parser, "Variant: 1",  "variant",  1)
+        self.assert_match(parser, "Variant: 12", "variant", 12)
+        self.assert_match(parser, "Variant: 42", "variant", 42)
+
+        # -- TYPE 2: YesNo
+        self.assert_match(parser, "Variant: yes", "variant", True)
+        self.assert_match(parser, "Variant: no",  "variant", False)
+        # -- IGNORECASE problem => re_opts
+        self.assert_match(parser, "Variant: YES", "variant", True)
+
+        # -- PARSE MISMATCH:
+        self.assert_mismatch(parser, "Variant: __YES__")
+        self.assert_mismatch(parser, "Variant: yes ")
+        self.assert_mismatch(parser, "Variant: yes ZZZ")
+        self.assert_mismatch(parser, "Variant: -1")
+
+        # -- PERFORM TESTS:
+        self.ensure_can_parse_all_enum_values(parser,
+                    parse_yesno, "Variant: %s", "variant")
 
 # -----------------------------------------------------------------------------
 # MAIN:

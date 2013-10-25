@@ -204,6 +204,46 @@ Create an type converter for an "Choice" list, a list of unique names
     assert result.answer == "yes"
 
 
+Variant (Type Alternatives)
+-------------------------------------------------------------------------------
+
+Sometimes you need a type converter that can accept text for multiple
+type converter alternatives. This is normally called a "variant" (or: union).
+
+Create an type converter for an "Variant" type that accepts:
+
+  * Numbers (positive numbers, as integer)
+  * Color enum values (by name)
+
+.. code-block:: python
+
+    from parse import Parser, with_pattern
+    from parse_type import TypeBuilder
+    from enum import Enum
+
+    class Color(Enum):
+        red   = 1
+        green = 2
+        blue  = 3
+
+    @with_pattern(r"\d+")
+    def parse_number(text):
+        return int(text)
+
+    # -- MAKE VARIANT: Alternatives of different type converters.
+    parse_color = TypeBuilder.make_enum(Color)
+    parse_variant = TypeBuilder.make_variant([parse_number, parse_color])
+    schema = "Variant: {variant:Number_or_Color}"
+    parser = Parser(schema, dict(Number_or_Color=parse_variant))
+    result = parser.parse("Variant: 42")
+    assert result.variant == 42
+    result = parser.parse("Variant: blue")
+    assert result.variant is Color.blue
+    result = parser.parse("Variant: __MISMATCH__")
+    assert not result
+
+
+
 Extended Parser with CardinalityField support
 -------------------------------------------------------------------------------
 

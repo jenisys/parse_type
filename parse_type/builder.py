@@ -66,6 +66,7 @@ from __future__ import absolute_import
 from .cardinality import TypeBuilder as CardinalityTypeBuilder
 import enum
 import inspect
+import re
 
 __all__ = ["TypeBuilder", "build_type_dict"]
 
@@ -77,6 +78,7 @@ class TypeBuilder(CardinalityTypeBuilder):
     """
     default_pattern = r".+?"
     default_strict = True
+    default_re_opts = (re.IGNORECASE | re.DOTALL)
 
     @staticmethod
     def make_enum(enum_mappings):
@@ -166,35 +168,37 @@ class TypeBuilder(CardinalityTypeBuilder):
         parse_choice2.choices = choices
         return parse_choice2
 
-# -- IDEA:
-#    @classmethod
-#    def make_type_choice(cls, type_converters):
-#        """
-#        Creates a type-converter function for several converter alternatives.
-#
-#        :param type_converters: List of type-converter alternatives.
-#        :return: Type-converter function object.
-#        """
-#        needs_default_pattern = 0
-#        choice_patterns = []
-#        for type_converter in type_converters:
-#            pattern = getattr(type_converter, "pattern", None)
-#            if not pattern:
-#                needs_default_pattern += 1
-#                continue
-#            choice_patterns.append(pattern)
-#        if needs_default_pattern:
-#            assert needs_default_pattern == 1
-#            choice_patterns.append(cls.default_pattern)
-#
-#        def parse_type_choice(text):
-#            # NEED TO KNOW: Which type converter pattern was matched.
-#            # return parse_type_choice.converters[x](text)
-#            return text
-#
-#        parse_type_choice.pattern = r"|".join(choice_patterns)
-#        parse_type_choice.converters = type_converters
-#        return parse_type_choice
+    @classmethod
+    def make_variant(cls, type_converters, re_opts=None, strict=True):
+        """
+        Creates a type converter for a number of type converter alternatives.
+        The first matching type converter is used.
+
+        REQUIRES: type_converter.pattern attribute
+
+        :param type_converters: List of type-converter alternatives.
+        :param re_opts:  Regular expression options zu use (=default_re_opts).
+        :param struct:   Enable assertion checks.
+        :return: Type converter function object.
+        """
+        # -- NOTE: Uses double-dispatch with regex pattern rematch because
+        #          match is not passed through to primary type converter.
+        assert type_converters
+        pattern = r")|(".join([tc.pattern for tc in type_converters])
+        pattern = r"("+ pattern + ")"
+        if re_opts is None:
+            re_opts = cls.default_re_opts
+
+        # -- BUILD: Composite type converter
+        def parse_variant(text, m=None):
+            for converter in parse_variant.converters:
+                if re.match(converter.pattern, text, re_opts):
+                    return converter(text)
+            assert not strict, "OOPS-VARIANT-MISMATCH: %s" % text
+            return None
+        parse_variant.pattern = pattern
+        parse_variant.converters = tuple(type_converters)
+        return parse_variant
 
 
 def build_type_dict(type_converters):
