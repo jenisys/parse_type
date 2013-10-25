@@ -194,6 +194,7 @@ class TypeBuilder(CardinalityTypeBuilder):
             for converter in parse_variant.converters:
                 if re.match(converter.pattern, text, re_opts):
                     return converter(text)
+            # -- pragma: no cover
             assert not strict, "OOPS-VARIANT-MISMATCH: %s" % text
             return None
         parse_variant.pattern = pattern
