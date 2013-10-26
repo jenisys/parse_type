@@ -63,12 +63,13 @@ EXAMPLE:
 """
 
 from __future__ import absolute_import
-from .cardinality import Cardinality, TypeBuilder as CardinalityTypeBuilder
+from .cardinality import \
+    Cardinality, TypeBuilder as CardinalityTypeBuilder, pattern_group_count
 import enum
 import inspect
 import re
 
-__all__ = ["TypeBuilder", "build_type_dict"]
+__all__ = ["TypeBuilder", "build_type_dict", "parse_anything"]
 
 
 class TypeBuilder(CardinalityTypeBuilder):
@@ -204,11 +205,14 @@ class TypeBuilder(CardinalityTypeBuilder):
         assert converters, "REQUIRE: Non-empty list."
         if len(converters) == 1:
             return converters[0]
+        if re_opts is None:
+            re_opts = cls.default_re_opts
 
         pattern = r")|(".join([tc.pattern for tc in converters])
         pattern = r"("+ pattern + ")"
-        if re_opts is None:
-            re_opts = cls.default_re_opts
+        group_count = len(converters)
+        for converter in converters:
+            group_count += pattern_group_count(converter.pattern)
 
         if compiled:
             convert_variant = cls.__create_convert_variant_compiled(converters,
@@ -217,7 +221,7 @@ class TypeBuilder(CardinalityTypeBuilder):
             convert_variant = cls.__create_convert_variant(re_opts, strict)
         convert_variant.pattern = pattern
         convert_variant.converters = tuple(converters)
-        convert_variant.group_count = len(converters)
+        convert_variant.group_count = group_count
         return convert_variant
 
     @staticmethod

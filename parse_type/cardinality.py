@@ -7,6 +7,12 @@ for a data type with the specified cardinality.
 # -- USE: enum34
 from enum import Enum
 
+# -----------------------------------------------------------------------------
+# FUNCTIONS:
+# -----------------------------------------------------------------------------
+def pattern_group_count(pattern):
+    return pattern.replace(r"\(", "").count("(")
+
 
 # -----------------------------------------------------------------------------
 # CLASS: Cardinality (Enum Class)
@@ -31,6 +37,14 @@ class Cardinality(Enum):
         self.schema = schema
         self.group_count = group_count  #< Number of match groups.
 
+    def is_many(self):
+        """
+        Checks for a more general interpretation of "many".
+        :return: True, if Cardinality.zero_or_more or Cardinality.one_or_more.
+        """
+        return ((self is Cardinality.zero_or_more) or
+                (self is Cardinality.one_or_more))
+
     def make_pattern(self, pattern, listsep=','):
         """
         Make pattern for a data type with the specified cardinality.
@@ -51,13 +65,19 @@ class Cardinality(Enum):
         else:
             return self.schema % (pattern, listsep, pattern)
 
-    def is_many(self):
+    def compute_group_count(self, pattern):
         """
-        Checks for a more general interpretation of "many".
-        :return: True, if Cardinality.zero_or_more or Cardinality.one_or_more.
+        Compute the number of regexp match groups when the pattern is provided
+        to the :func:`Cardinality.make_pattern()` method.
+
+        :param pattern: Item regexp pattern (as string).
+        :return: Number of regexp match groups in the cardinality pattern.
         """
-        return ((self is Cardinality.zero_or_more) or
-                (self is Cardinality.one_or_more))
+        group_count = self.group_count
+        pattern_repeated = 1
+        if self.is_many():
+            pattern_repeated = 2
+        return group_count + pattern_repeated * pattern_group_count(pattern)
 
 
 # -----------------------------------------------------------------------------
@@ -71,6 +91,8 @@ class TypeBuilder(object):
     """
     anything_pattern = r".+?"
     default_pattern  = anything_pattern
+
+
 
     @classmethod
     def with_cardinality(cls, cardinality, converter, pattern=None,
@@ -104,9 +126,11 @@ class TypeBuilder(object):
         :param pattern:  Regexp pattern for an item (=converter.pattern).
         :return: type-converter for optional<T> (T or None).
         """
+        cardinality = Cardinality.zero_or_one
         if not pattern:
             pattern = getattr(converter, "pattern", cls.default_pattern)
-        optional_pattern = Cardinality.zero_or_one.make_pattern(pattern)
+        optional_pattern = cardinality.make_pattern(pattern)
+        group_count = cardinality.compute_group_count(pattern)
 
         def convert_optional(text, m=None):
             if text:
@@ -115,7 +139,7 @@ class TypeBuilder(object):
                 return None
             return converter(text)
         convert_optional.pattern = optional_pattern
-        convert_optional.group_count = Cardinality.zero_or_one.group_count
+        convert_optional.group_count = group_count
         return convert_optional
 
     @classmethod
@@ -129,9 +153,11 @@ class TypeBuilder(object):
         :param listsep:  Optional list separator between items (default: ',')
         :return: type-converter for list<T>
         """
+        cardinality = Cardinality.zero_or_more
         if not pattern:
             pattern  = getattr(converter, "pattern", cls.default_pattern)
-        many0_pattern = Cardinality.zero_or_more.make_pattern(pattern, listsep)
+        many0_pattern = cardinality.make_pattern(pattern, listsep)
+        group_count = cardinality.compute_group_count(pattern)
 
         def convert_list0(text, m=None):
             if text:
@@ -140,7 +166,7 @@ class TypeBuilder(object):
                 return []
             return [converter(part.strip()) for part in text.split(listsep)]
         convert_list0.pattern = many0_pattern
-        convert_list0.group_count = Cardinality.zero_or_more.group_count
+        convert_list0.group_count = group_count
         return convert_list0
 
     @classmethod
@@ -154,14 +180,16 @@ class TypeBuilder(object):
         :param listsep:  Optional list separator between items (default: ',')
         :return: Type converter for list<T>
         """
+        cardinality = Cardinality.one_or_more
         if not pattern:
             pattern = getattr(converter, "pattern", cls.default_pattern)
-        many_pattern = Cardinality.one_or_more.make_pattern(pattern, listsep)
+        many_pattern = cardinality.make_pattern(pattern, listsep)
+        group_count = cardinality.compute_group_count(pattern)
 
         def convert_list(text, m=None):
             return [converter(part.strip()) for part in text.split(listsep)]
         convert_list.pattern = many_pattern
-        convert_list.group_count = Cardinality.one_or_more.group_count
+        convert_list.group_count = group_count
         return convert_list
 
     # -- ALIAS METHODS:
