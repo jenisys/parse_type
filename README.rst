@@ -89,7 +89,7 @@ This is equivalent to:
     parser = parse.Parser(schema, dict(Number=parse_number))
     result = parser.parse("Hello 42")
     assert result is not None, "REQUIRE: text matches the schema."
-    assert result.number == 42
+    assert result["number"] == 42
 
     result = parser.parse("Hello XXX")
     assert result is None, "MISMATCH: text does not match the schema."
@@ -117,7 +117,7 @@ with cardinality "1..* = 1+" (many) from the type converter for a "Number".
     schema = "List: {numbers:ManyNumbers}"
     parser = Parser(schema, dict(ManyNumbers=parse_numbers))
     result = parser.parse("List: 1, 2, 3")
-    assert result.numbers == [1, 2, 3]
+    assert result["numbers"] == [1, 2, 3]
 
 
 Create an type converter for an "OptionalNumbers" with cardinality "0..1 = ?"
@@ -134,9 +134,9 @@ Create an type converter for an "OptionalNumbers" with cardinality "0..1 = ?"
     schema = "Optional: {number:OptionalNumber}"
     parser = Parser(schema, dict(OptionalNumber=parse_optional_number))
     result = parser.parse("Optional: 42")
-    assert result.number == 42
+    assert result["number"] == 42
     result = parser.parse("Optional: ")
-    assert result.number == None
+    assert result["number"] == None
 
 
 Enumeration (Name-to-Value Mapping)
@@ -154,7 +154,7 @@ the mapping as dictionary.
     parse_enum_yesno = TypeBuilder.make_enum({"yes": True, "no": False})
     parser = Parser("Answer: {answer:YesNo}", dict(YesNo=parse_enum_yesno))
     result = parser.parse("Answer: yes")
-    assert result.answer == True
+    assert result["answer"] == True
 
 
 Create an type converter for an "Enumeration" from the description of
@@ -177,7 +177,7 @@ backport; see also: `PEP-0435`_).
     parse_enum_color = TypeBuilder.make_enum(Color)
     parser = Parser("Select: {color:Color}", dict(Color=parse_enum_color))
     result = parser.parse("Select: red")
-    assert result.color is Color.red
+    assert result["color"] is Color.red
 
 .. _`Python 3.4 enum`: http://docs.python.org/3.4/library/enum.html#module-enum
 .. _enum34:   http://pypi.python.org/pypi/enum34
@@ -201,7 +201,7 @@ Create an type converter for an "Choice" list, a list of unique names
     schema = "Answer: {answer:ChoiceYesNo}"
     parser = Parser(schema, dict(ChoiceYesNo=parse_choice_yesno))
     result = parser.parse("Answer: yes")
-    assert result.answer == "yes"
+    assert result["answe"]r == "yes"
 
 
 Variant (Type Alternatives)
@@ -235,10 +235,12 @@ Create an type converter for an "Variant" type that accepts:
     parse_variant = TypeBuilder.make_variant([parse_number, parse_color])
     schema = "Variant: {variant:Number_or_Color}"
     parser = Parser(schema, dict(Number_or_Color=parse_variant))
+
+    # -- TEST VARIANT: With number, color and mismatch.
     result = parser.parse("Variant: 42")
-    assert result.variant == 42
+    assert result["variant"] == 42
     result = parser.parse("Variant: blue")
-    assert result.variant is Color.blue
+    assert result["variant"] is Color.blue
     result = parser.parse("Variant: __MISMATCH__")
     assert not result
 
@@ -271,4 +273,4 @@ Example:
 
     # -- USE: parser.
     result = parser.parse("List: 1, 2, 3")
-    assert result.numbers == [1, 2, 3]
+    assert result["numbers"] == [1, 2, 3]
