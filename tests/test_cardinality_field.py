@@ -18,12 +18,11 @@ STATUS:
 
 from __future__ import absolute_import
 from .parse_type_test \
-    import ParseTypeTestCase, TestCase, parse_number, unittest
+    import TestCase, parse_number, unittest
 from .test_cardinality import CardinalityTypeBuilderTest
 from parse_type import Cardinality
 from parse_type.cardinality_field \
     import CardinalityField, CardinalityFieldTypeBuilder, MissingTypeError
-import parse
 
 
 # -------------------------------------------------------------------------

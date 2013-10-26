@@ -6,6 +6,7 @@ Test suite to test the :mod:`parse_type.cardinality` module.
 
 from .parse_type_test import ParseTypeTestCase, parse_number
 from parse_type import Cardinality, TypeBuilder, build_type_dict
+from parse_type.parse import Parser as ParserExt
 import parse
 import unittest
 
@@ -256,12 +257,10 @@ class TestTypeBuilder4Cardinality(CardinalityTypeBuilderTest):
         self.assertEqual(parse_numbers.pattern, r"(\d+)(\s*,\s*(\d+))*")
 
     def test_with_one_or_more_basics_with_other_separator(self):
-        listsep = ';'
-        parse_numbers2 = TypeBuilder.with_one_or_more(parse_number, listsep)
+        parse_numbers2 = TypeBuilder.with_one_or_more(parse_number, listsep=';')
         self.assertEqual(parse_numbers2.pattern, r"(\d+)(\s*;\s*(\d+))*")
 
-        listsep = ':'
-        parse_numbers2 = TypeBuilder.with_one_or_more(parse_number, listsep)
+        parse_numbers2 = TypeBuilder.with_one_or_more(parse_number, listsep=':')
         self.assertEqual(parse_numbers2.pattern, r"(\d+)(\s*:\s*(\d+))*")
 
     def test_with_one_or_more(self):
@@ -319,8 +318,7 @@ class TestTypeBuilder4Cardinality(CardinalityTypeBuilderTest):
         self.assert_mismatch(parser, "List: a, b",  "colors")  # List of ...
 
     def test_with_one_or_more_with_other_separator(self):
-        listsep = ';'
-        parse_numbers2 = TypeBuilder.with_one_or_more(parse_number, listsep)
+        parse_numbers2 = TypeBuilder.with_one_or_more(parse_number, listsep=';')
         parse_numbers2.name = "Numbers2"
 
         extra_types = build_type_dict([ parse_numbers2 ])
@@ -365,6 +363,168 @@ class TestTypeBuilder4Cardinality(CardinalityTypeBuilderTest):
         parse_many_numbers = TypeBuilder.with_cardinality(
                 Cardinality.many, parse_number)
         self.check_parse_number_with_many(parse_many_numbers)
+
+    def test_parse_with_optional_and_named_fields(self):
+        parse_opt_number = TypeBuilder.with_optional(parse_number)
+        parse_opt_number.name = "Number?"
+
+        type_dict = build_type_dict([parse_opt_number, parse_number])
+        schema = "Numbers: {number1:Number?} {number2:Number}"
+        parser = parse.Parser(schema, type_dict)
+
+        # -- CASE: Optional number is present
+        result = parser.parse("Numbers: 34 12")
+        expected = dict(number1=34, number2=12)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.named, expected)
+
+        # -- CASE: Optional number is missing
+        result = parser.parse("Numbers:  12")
+        expected = dict(number1=None, number2=12)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.named, expected)
+
+    def test_parse_with_optional_and_unnamed_fields(self):
+        # -- ENSURE: Cardinality.optional.group_count is correct
+        # REQUIRES: ParserExt := parse_type.Parser with group_count support
+        parse_opt_number = TypeBuilder.with_optional(parse_number)
+        parse_opt_number.name = "Number?"
+
+        type_dict = build_type_dict([parse_opt_number, parse_number])
+        schema = "Numbers: {:Number?} {:Number}"
+        parser = ParserExt(schema, type_dict)
+
+        # -- CASE: Optional number is present
+        result = parser.parse("Numbers: 34 12")
+        expected = (34, 12)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.fixed, tuple(expected))
+
+        # -- CASE: Optional number is missing
+        result = parser.parse("Numbers:  12")
+        expected = (None, 12)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.fixed, tuple(expected))
+
+    def test_parse_with_many_and_unnamed_fields(self):
+        # -- ENSURE: Cardinality.one_or_more.group_count is correct
+        # REQUIRES: ParserExt := parse_type.Parser with group_count support
+        parse_many_numbers = TypeBuilder.with_many(parse_number)
+        parse_many_numbers.name = "Number+"
+
+        type_dict = build_type_dict([parse_many_numbers, parse_number])
+        schema = "Numbers: {:Number+} {:Number}"
+        parser = ParserExt(schema, type_dict)
+
+        # -- CASE:
+        result = parser.parse("Numbers: 1, 2, 3 42")
+        expected = ([1, 2, 3], 42)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.fixed, tuple(expected))
+
+        result = parser.parse("Numbers: 3 43")
+        expected = ([ 3 ], 43)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.fixed, tuple(expected))
+
+    def test_parse_with_many0_and_unnamed_fields(self):
+        # -- ENSURE: Cardinality.zero_or_more.group_count is correct
+        # REQUIRES: ParserExt := parse_type.Parser with group_count support
+        parse_many0_numbers = TypeBuilder.with_many0(parse_number)
+        parse_many0_numbers.name = "Number*"
+
+        type_dict = build_type_dict([parse_many0_numbers, parse_number])
+        schema = "Numbers: {:Number*} {:Number}"
+        parser = ParserExt(schema, type_dict)
+
+        # -- CASE: Optional numbers are present
+        result = parser.parse("Numbers: 1, 2, 3 42")
+        expected = ([1, 2, 3], 42)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.fixed, tuple(expected))
+
+        # -- CASE: Optional numbers are missing := EMPTY-LIST
+        result = parser.parse("Numbers:  43")
+        expected = ([ ], 43)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.fixed, tuple(expected))
+
+
+# class TestParserWithManyTypedFields(ParseTypeTestCase):
+
+    #parse_variant1 = TypeBuilder.make_variant([parse_number, parse_yesno])
+    #parse_variant1.name = "Number_or_YesNo"
+    #parse_variant2 = TypeBuilder.make_variant([parse_color, parse_person_choice])
+    #parse_variant2.name = "Color_or_PersonChoice"
+    #TYPE_CONVERTERS = [
+    #    parse_number,
+    #    parse_yesno,
+    #    parse_color,
+    #    parse_person_choice,
+    #    parse_variant1,
+    #    parse_variant2,
+    #]
+    #
+#    def test_parse_with_many_named_fields(self):
+#        type_dict = build_type_dict(self.TYPE_CONVERTERS)
+#        schema = """\
+#Number:   {number:Number}
+#YesNo:    {answer:YesNo}
+#Color:    {color:Color}
+#Person:   {person:PersonChoice}
+#Variant1: {variant1:Number_or_YesNo}
+#Variant2: {variant2:Color_or_PersonChoice}
+#"""
+#        parser = parse.Parser(schema, type_dict)
+#
+#        text = """\
+#Number:   12
+#YesNo:    yes
+#Color:    red
+#Person:   Alice
+#Variant1: 42
+#Variant2: Bob
+#"""
+#        expected = dict(
+#            number=12,
+#            answer=True,
+#            color=Color.red,
+#            person="Alice",
+#            variant1=42,
+#            variant2="Bob"
+#        )
+#
+#        result = parser.parse(text)
+#        self.assertIsNotNone(result)
+#        self.assertEqual(result.named, expected)
+
+#    def test_parse_with_many_unnamed_fields(self):
+#        type_dict = build_type_dict(self.TYPE_CONVERTERS)
+#        schema = """\
+#Number:   {:Number}
+#YesNo:    {:YesNo}
+#Color:    {:Color}
+#Person:   {:PersonChoice}
+#"""
+#        # -- OMIT: XFAIL, due to group_index delta counting => Parser problem.
+#        # Variant2: {:Color_or_PersonChoice}
+#        # Variant1: {:Number_or_YesNo}
+#        parser = parse.Parser(schema, type_dict)
+#
+#        text = """\
+#Number:   12
+#YesNo:    yes
+#Color:    red
+#Person:   Alice
+#"""
+#        # SKIP: Variant2: Bob
+#        # SKIP: Variant1: 42
+#        expected = [ 12, True, Color.red, "Alice", ] # -- SKIP: "Bob", 42 ]
+#
+#        result = parser.parse(text)
+#        self.assertIsNotNone(result)
+#        self.assertEqual(result.fixed, tuple(expected))
+
 
 
 # -----------------------------------------------------------------------------

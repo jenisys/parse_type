@@ -17,18 +17,19 @@ class Cardinality(Enum):
     patterns for a data type with the specified cardinality.
     """
     __order__ = "one, zero_or_one, zero_or_more, one_or_more"
-    one          = (None, )
-    zero_or_one  = (r"(%s)?", )                # SCHEMA: pattern
-    zero_or_more = (r"(%s)?(\s*%s\s*(%s))*", ) # SCHEMA: pattern listsep pattern
-    one_or_more  = (r"(%s)(\s*%s\s*(%s))*", )  # SCHEMA: pattern listsep pattern
+    one          = (None, 0)
+    zero_or_one  = (r"(%s)?", 1)                 # SCHEMA: pattern
+    zero_or_more = (r"(%s)?(\s*%s\s*(%s))*", 3)  # SCHEMA: pattern sep pattern
+    one_or_more  = (r"(%s)(\s*%s\s*(%s))*",  3)  # SCHEMA: pattern sep pattern
 
     # -- ALIASES:
     optional = zero_or_one
     many0 = zero_or_more
     many  = one_or_more
 
-    def __init__(self, schema):
+    def __init__(self, schema, group_count=0):
         self.schema = schema
+        self.group_count = group_count  #< Number of match groups.
 
     def make_pattern(self, pattern, listsep=','):
         """
@@ -68,99 +69,114 @@ class TypeBuilder(object):
     It supports to build new type-converters for different cardinality
     based on the type-converter for cardinality one.
     """
-    default_pattern = r".+?"
+    anything_pattern = r".+?"
+    default_pattern  = anything_pattern
 
     @classmethod
-    def with_cardinality(cls, cardinality, parse_type, listsep=','):
+    def with_cardinality(cls, cardinality, converter, pattern=None,
+                         listsep=','):
+        """
+        Creates a type converter for the specified cardinality
+        by using the type converter for T.
+
+        :param cardinality: Cardinality to use (0..1, 0..*, 1..*).
+        :param converter: Type converter (function) for data type T.
+        :param pattern:  Regexp pattern for an item (=converter.pattern).
+        :return: type-converter for optional<T> (T or None).
+        """
         if cardinality is Cardinality.one:
-            return parse_type
+            return converter
         # -- NORMAL-CASE
         builder_func = getattr(cls, "with_%s" % cardinality.name)
         if cardinality is Cardinality.zero_or_one:
-            return builder_func(parse_type)
+            return builder_func(converter, pattern)
         else:
             # -- MANY CASE: 0..*, 1..*
-            return builder_func(parse_type, listsep=listsep)
+            return builder_func(converter, pattern, listsep=listsep)
 
     @classmethod
-    def with_zero_or_one(cls, parse_type):
+    def with_zero_or_one(cls, converter, pattern=None):
         """
-        Creates a type-converter function for a T with 0..1 times
-        by using the type-converter for one item of T.
+        Creates a type converter for a T with 0..1 times
+        by using the type converter for one item of T.
 
-        :param parse_type: Type-converter (function) for data type T.
+        :param converter: Type converter (function) for data type T.
+        :param pattern:  Regexp pattern for an item (=converter.pattern).
         :return: type-converter for optional<T> (T or None).
         """
-        def parse_optional(text, m=None):
+        if not pattern:
+            pattern = getattr(converter, "pattern", cls.default_pattern)
+        optional_pattern = Cardinality.zero_or_one.make_pattern(pattern)
+
+        def convert_optional(text, m=None):
             if text:
                 text = text.strip()
             if not text:
                 return None
-            return parse_type(text)
-        pattern = getattr(parse_type, "pattern", cls.default_pattern)
-        new_pattern = Cardinality.zero_or_one.make_pattern(pattern)
-        parse_optional.pattern = new_pattern
-        return parse_optional
+            return converter(text)
+        convert_optional.pattern = optional_pattern
+        convert_optional.group_count = Cardinality.zero_or_one.group_count
+        return convert_optional
 
     @classmethod
-    def with_zero_or_more(cls, parse_type, listsep=",", max_size=None):
+    def with_zero_or_more(cls, converter, pattern=None, listsep=","):
         """
-        Creates a type-converter function for a list<T> with 0..N items
-        by using the type-converter for one item of T.
+        Creates a type converter function for a list<T> with 0..N items
+        by using the type converter for one item of T.
 
-        :param parse_type: Type-converter (function) for data type T.
+        :param converter: Type converter (function) for data type T.
+        :param pattern:  Regexp pattern for an item (=converter.pattern).
         :param listsep:  Optional list separator between items (default: ',')
-        :param max_size: Optional max. number of items constraint (future).
         :return: type-converter for list<T>
         """
-        def parse_list0(text, m=None):
+        if not pattern:
+            pattern  = getattr(converter, "pattern", cls.default_pattern)
+        many0_pattern = Cardinality.zero_or_more.make_pattern(pattern, listsep)
+
+        def convert_list0(text, m=None):
             if text:
                 text = text.strip()
             if not text:
                 return []
-            parts = [ parse_type(part.strip())
-                      for part in text.split(listsep) ]
-            return parts
-        pattern  = getattr(parse_type, "pattern", cls.default_pattern)
-        list_pattern = Cardinality.zero_or_more.make_pattern(pattern, listsep)
-        parse_list0.pattern  = list_pattern
-        parse_list0.max_size = max_size
-        return parse_list0
+            return [converter(part.strip()) for part in text.split(listsep)]
+        convert_list0.pattern = many0_pattern
+        convert_list0.group_count = Cardinality.zero_or_more.group_count
+        return convert_list0
 
     @classmethod
-    def with_one_or_more(cls, parse_type, listsep=",", max_size=None):
+    def with_one_or_more(cls, converter, pattern=None, listsep=","):
         """
-        Creates a type-converter function for a list<T> with 1..N items
-        by using the type-converter for one item of T.
+        Creates a type converter function for a list<T> with 1..N items
+        by using the type converter for one item of T.
 
-        :param parse_type: Type-converter (function) for data type T.
+        :param converter: Type converter (function) for data type T.
+        :param pattern:  Regexp pattern for an item (=converter.pattern).
         :param listsep:  Optional list separator between items (default: ',')
-        :param max_size: Optional max. number of items constraint (future).
-        :return: type-converter for list<T>
+        :return: Type converter for list<T>
         """
-        def parse_list(text, m=None):
-            parts = [ parse_type(part.strip())
-                      for part in text.split(listsep) ]
-            return parts
-        pattern = getattr(parse_type, "pattern", cls.default_pattern)
-        list_pattern = Cardinality.one_or_more.make_pattern(pattern, listsep)
-        parse_list.pattern  = list_pattern
-        parse_list.max_size = max_size
-        return parse_list
+        if not pattern:
+            pattern = getattr(converter, "pattern", cls.default_pattern)
+        many_pattern = Cardinality.one_or_more.make_pattern(pattern, listsep)
+
+        def convert_list(text, m=None):
+            return [converter(part.strip()) for part in text.split(listsep)]
+        convert_list.pattern = many_pattern
+        convert_list.group_count = Cardinality.one_or_more.group_count
+        return convert_list
 
     # -- ALIAS METHODS:
     @classmethod
-    def with_optional(cls, parse_type):
+    def with_optional(cls, converter, pattern=None):
         """Alias for :py:meth:`with_zero_or_one()` method."""
-        return cls.with_zero_or_one(parse_type)
+        return cls.with_zero_or_one(converter, pattern)
 
     @classmethod
-    def with_many(cls, parse_type, **kwargs):
+    def with_many(cls, converter, pattern=None, listsep=','):
         """Alias for :py:meth:`with_one_or_more()` method."""
-        return cls.with_one_or_more(parse_type, **kwargs)
+        return cls.with_one_or_more(converter, pattern, listsep)
 
     @classmethod
-    def with_many0(cls, parse_type, **kwargs):
+    def with_many0(cls, converter, pattern=None, listsep=','):
         """Alias for :py:meth:`with_zero_or_more()` method."""
-        return cls.with_zero_or_more(parse_type, **kwargs)
+        return cls.with_zero_or_more(converter, pattern, listsep)
 

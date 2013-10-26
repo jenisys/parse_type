@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from parse_type import TypeBuilder
+from enum import Enum
 try:
     import unittest2 as unittest
 except ImportError:
@@ -24,7 +25,16 @@ parse_yesno = TypeBuilder.make_enum({
 })
 parse_yesno.name = "YesNo"      # For testing only.
 
-# -- ENUM DATATYPE:
+# -- ENUM CLASS:
+class Color(Enum):
+    red = 1
+    green = 2
+    blue = 3
+
+parse_color = TypeBuilder.make_enum(Color)
+parse_color.name = "Color"
+
+# -- CHOICE DATATYPE:
 parse_person_choice = TypeBuilder.make_choice(["Alice", "Bob", "Charly"])
 parse_person_choice.name = "PersonChoice"      # For testing only.
 
@@ -48,19 +58,6 @@ class ParseTypeTestCase(TestCase):
     Common test case base class for :mod:`parse_type` tests.
     """
 
-    #@staticmethod
-    #def build_type_dict(type_converters):
-    #    """
-    #    XXX
-    #    Builds type dictionary for user-defined type converters, used by parse.
-    #    :param type_converters: List of type-converters (parse_types)
-    #    :return: Type-converter dictionary
-    #    """
-    #    more_types = {}
-    #    for type_converter in type_converters:
-    #        more_types[type_converter.name] = type_converter
-    #    return more_types
-
     def assert_match(self, parser, text, param_name, expected):
         """
         Check that a parser can parse the provided text and extracts the
@@ -70,7 +67,7 @@ class ParseTypeTestCase(TestCase):
         :param text:   Text to parse
         :param param_name: Name of parameter
         :param expected:   Expected value of parameter.
-        :raise: AssertationError on failures.
+        :raise: AssertionError on failures.
         """
         result = parser.parse(text)
         self.assertIsNotNone(result)
@@ -84,10 +81,39 @@ class ParseTypeTestCase(TestCase):
         :param parser: Parser to use
         :param text:   Text to parse
         :param param_name: Name of parameter
-        :raise: AssertationError on failures.
+        :raise: AssertionError on failures.
         """
         result = parser.parse(text)
         self.assertIsNone(result)
+
+    def ensure_can_parse_all_enum_values(self, parser, type_converter,
+                                         schema, name):
+        # -- ENSURE: Known enum values are correctly extracted.
+        for value_name, value in type_converter.mappings.items():
+            text = schema % value_name
+            self.assert_match(parser, text, name,  value)
+
+    def ensure_can_parse_all_choices(self, parser, type_converter, schema, name):
+        transform = getattr(type_converter, "transform", None)
+        for choice_value in type_converter.choices:
+            text = schema % choice_value
+            expected_value = choice_value
+            if transform:
+                assert callable(transform)
+                expected_value = transform(choice_value)
+            self.assert_match(parser, text, name,  expected_value)
+
+    def ensure_can_parse_all_choices2(self, parser, type_converter, schema, name):
+        transform = getattr(type_converter, "transform", None)
+        for index, choice_value in enumerate(type_converter.choices):
+            text = schema % choice_value
+            if transform:
+                assert callable(transform)
+                expected_value = (index, transform(choice_value))
+            else:
+                expected_value = (index, choice_value)
+            self.assert_match(parser, text, name, expected_value)
+
 
 
 # Copyright (c) 2012-2013 by Jens Engel (https://github/jenisys/parse_type)

@@ -136,7 +136,7 @@ class CardinalityFieldTypeBuilder(object):
 
         assert callable(type_converter)
         type_variant = TypeBuilder.with_cardinality(cardinality,
-                                    type_converter, cls.listsep)
+                                    type_converter, listsep=cls.listsep)
         type_variant.name = type_name
         return type_variant
 
