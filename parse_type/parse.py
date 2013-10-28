@@ -3,7 +3,7 @@
 # VERSION:  parse 1.6.3
 # Same as original parse module except the following extensions.
 # EXTENSIONS:
-#	* group_count attribute support for user-defined type converters
+#  * group_count attribute support for user-defined type converters
 #     => FIXES: group_index offset problem for fixed fields
 #        when pattern has groups
 # -- ORIGINAL-CODE STARTS-HERE ------------------------------------------------
@@ -818,10 +818,10 @@ class Parser(object):
         if type in self._extra_types:
             type_converter = self._extra_types[type]
             s = getattr(type_converter, 'pattern', r'.+?')
-			# -- EXTENSION: group_count attribute
+            # -- EXTENSION: group_count attribute
             group_count = getattr(type_converter, 'group_count', 0)
             self._group_index += group_count
-			# -- EXTENSION-END
+            # -- EXTENSION-END
 
             def f(string, m):
                 return type_converter(string)
