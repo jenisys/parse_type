@@ -201,7 +201,7 @@ Create an type converter for an "Choice" list, a list of unique names
     schema = "Answer: {answer:ChoiceYesNo}"
     parser = Parser(schema, dict(ChoiceYesNo=parse_choice_yesno))
     result = parser.parse("Answer: yes")
-    assert result["answe"]r == "yes"
+    assert result["answer"] == "yes"
 
 
 Variant (Type Alternatives)
