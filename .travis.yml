@@ -7,8 +7,7 @@ python:
   - pypy
 
 install:
-  - pip install --use-mirrors -q unittest2
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install --use-mirrors unittest2; fi
   - python setup.py -q install
 script:
-  - python --version
   - py.test tests
