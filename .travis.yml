@@ -7,7 +7,7 @@ python:
   - pypy
 
 install:
-  # -- DISABLED: pip install --use-mirrors -q -U pytest
+  - pip install --use-mirrors -q unittest2
   - python setup.py -q install
 script:
   - python --version
