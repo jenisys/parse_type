@@ -14,6 +14,7 @@ parse_type
     :target: https://travis-ci.org/jenisys/parse_type
     :alt: Travis CI Build Status
 
+
 `parse_type`_ extends the `parse`_ module (opposite of `string.format()`_)
 with the following features:
 
