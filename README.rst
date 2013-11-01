@@ -18,10 +18,10 @@ parse_type
 `parse_type`_ extends the `parse`_ module (opposite of `string.format()`_)
 with the following features:
 
-    * build parse_types for common use cases (enum/mapping, choice)
-    * build a parse_type with a cardinality constraint (0..1, 0..*, 1..*)
-      from the parse_type with cardinality=1.
-    * compose parse types from other parse types
+    * build type converters for common use cases (enum/mapping, choice)
+    * build a type converter with a cardinality constraint (0..1, 0..*, 1..*)
+      from the type converter with cardinality=1.
+    * compose a type converter from other type converters
     * an extended parser that supports the CardinalityField naming schema
       and creates missing type variants (0..1, 0..*, 1..*) from the
       primary type converter
@@ -37,10 +37,9 @@ Definitions
 *type converter*
     A type converter function that converts a textual representation
     of a value type into instance of this value type.
-
-*parse_type*
-    A type converter function that is annotated with attributes
-    that allows the `parse`_ module to process it as generic type.
+    In addition, a type converter function is often annotated with attributes
+    that allows the `parse`_ module to use it in a generic way.
+    A type converter is also called a *parse_type* (a definition used here).
 
 *cardinality field*
     A naming convention for related types that differ in cardinality.
@@ -58,7 +57,7 @@ Definitions
 Basic Example
 -------------------------------------------------------------------------------
 
-Define an own parse_type for numbers (integers):
+Define an own type converter for numbers (integers):
 
 .. code-block:: python
 
@@ -82,7 +81,7 @@ This is equivalent to:
 
 .. code-block:: python
 
-    # -- USE CASE: Use the parse_type (type converter).
+    # -- USE CASE: Use the type converter with the parse module.
     schema = "Hello {number:Number}"
     parser = parse.Parser(schema, dict(Number=parse_number))
     result = parser.parse("Hello 42")
@@ -106,7 +105,7 @@ with cardinality "1..* = 1+" (many) from the type converter for a "Number".
 
 .. code-block:: python
 
-    # -- USE CASE: Create new parse_type with a cardinality constraint.
+    # -- USE CASE: Create new type converter with a cardinality constraint.
     # CARDINALITY: many := one or more (1..*)
     from parse import Parser
     from parse_type import TypeBuilder
@@ -123,7 +122,7 @@ Create an type converter for an "OptionalNumbers" with cardinality "0..1 = ?"
 
 .. code-block:: python
 
-    # -- USE CASE: Create new parse_type with cardinality constraint.
+    # -- USE CASE: Create new type converter with cardinality constraint.
     # CARDINALITY: optional := zero or one (0..1)
     from parse import Parser
     from parse_type import TypeBuilder
@@ -145,7 +144,7 @@ the mapping as dictionary.
 
 .. code-block:: python
 
-    # -- USE CASE: Create an enumeration parse_type (name-to-value mapping).
+    # -- USE CASE: Create a type converter for an enumeration.
     from parse import Parser
     from parse_type import TypeBuilder
 
@@ -161,7 +160,7 @@ backport; see also: `PEP-0435`_).
 
 .. code-block:: python
 
-    # -- USE CASE: Create a parse_type for enum34 enumeration class.
+    # -- USE CASE: Create a type converter for enum34 enumeration class.
     # NOTE: Use Python 3.4 or enum34 backport.
     from parse import Parser
     from parse_type import TypeBuilder
