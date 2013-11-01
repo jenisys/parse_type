@@ -13,7 +13,8 @@ The supported cardinality are:
   * 0..N  zero_or_more, list_of<T>
   * 1..N  one_or_more,  list_of<T> (many)
 
-.. code-block:: python
+
+.. doctest:: cardinality
 
     >>> from parse_type import TypeBuilder
     >>> from parse import Parser
@@ -35,10 +36,7 @@ Enumeration Type (Name-to-Value Mappings)
 An Enumeration data type allows to select one of several enum values by using
 its name. The converter function returns the selected enum value.
 
-.. code-block:: python
-
-    >>> from parse_type import TypeBuilder
-    >>> from parse import Parser
+.. doctest:: make_enum
 
     >>> parse_enum_yesno = TypeBuilder.make_enum({"yes": True, "no": False})
     >>> more_types = { "YesNo": parse_enum_yesno }
@@ -52,7 +50,7 @@ Choice (Name Enumerations)
 
 A Choice data type allows to select one of several strings.
 
-EXAMPLE:
+.. doctest:: make_choice
 
     >>> parse_choice_yesno = TypeBuilder.make_choice(["yes", "no"])
     >>> more_types = { "ChoiceYesNo": parse_choice_yesno }
@@ -64,7 +62,8 @@ EXAMPLE:
 
 from __future__ import absolute_import
 from .cardinality import \
-    Cardinality, TypeBuilder as CardinalityTypeBuilder, pattern_group_count
+    Cardinality, TypeBuilder as CardinalityTypeBuilder
+from parse_type.cardinality import pattern_group_count
 import enum
 import inspect
 import re
@@ -135,7 +134,7 @@ class TypeBuilder(CardinalityTypeBuilder):
 
         :param choices: List of strings as choice.
         :param transform: Optional, initial transform function for parsed text.
-        :return: Type-converter (parse_choice) function object.
+        :return: Type converter function object for this choices.
         """
         # -- NOTE: Parser uses re.IGNORECASE flag
         #    => transform may enforce case.
@@ -162,7 +161,7 @@ class TypeBuilder(CardinalityTypeBuilder):
 
         :param choices: List of strings as choice.
         :param transform: Optional, initial transform function for parsed text.
-        :return: Type converter (parse_choice) function object for choice.
+        :return: Type converter function object for this choices.
         """
         choices = cls._normalize_choices(choices, transform)
         if strict is None:
@@ -196,9 +195,11 @@ class TypeBuilder(CardinalityTypeBuilder):
 
         .. note::
 
-            Works only with named fields in Parser.
+            Works only with named fields in :class:`parse.Parser`.
             Parser needs group_index delta for unnamed/fixed fields.
             This is not supported for user-defined types.
+            Otherwise, you need to use :class:`parse_type.parse.Parser`
+            (patched version of the :mod:`parse` module).
         """
         # -- NOTE: Uses double-dispatch with regex pattern rematch because
         #          match is not passed through to primary type converter.
@@ -254,41 +255,6 @@ class TypeBuilder(CardinalityTypeBuilder):
         return convert_variant
 
 
-    #@classmethod
-    #def make_variant(cls, converters, re_opts=None, strict=True):
-    #    """
-    #    Creates a type converter for a number of type converter alternatives.
-    #    The first matching type converter is used.
-    #
-    #    REQUIRES: type_converter.pattern attribute
-    #
-    #    :param converters: List of type-converter alternatives.
-    #    :param re_opts:  Regular expression options zu use (=default_re_opts).
-    #    :param struct:   Enable assertion checks.
-    #    :return: Type converter function object.
-    #    """
-    #    # -- NOTE: Uses double-dispatch with regex pattern rematch because
-    #    #          match is not passed through to primary type converter.
-    #    assert converters
-    #    pattern = r")|(".join([tc.pattern for tc in converters])
-    #    pattern = r"("+ pattern + ")"
-    #    if re_opts is None:
-    #        re_opts = cls.default_re_opts
-    #
-    #    # -- BUILD: Composite type converter
-    #    def convert_variant(text, m=None):
-    #        for converter in convert_variant.converters:
-    #            # if converter.matcher.match(text):
-    #            if re.match(converter.pattern, text, re_opts):
-    #                return converter(text)
-    #        # -- pragma: no cover
-    #        assert not strict, "OOPS-VARIANT-MISMATCH: %s" % text
-    #        return None
-    #    convert_variant.pattern = pattern
-    #    convert_variant.converters = tuple(converters)
-    #    return convert_variant
-
-
 def build_type_dict(converters):
     """
     Builds type dictionary for user-defined type converters,
@@ -318,39 +284,6 @@ def parse_anything(text, match=None, match_start=0):
     return text
 parse_anything.pattern = TypeBuilder.anything_pattern
 
-
-#def parse_word(text, match=None, match_start=0):
-#    return text.strip()
-#parse_word.pattern = r"\w+"
-#
-#convert_list = TypeBuilder.with_many(parse_anything, listsep=',')
-#convert_list.name = "List"
-#convert_list.__doc__ = """\
-#    Converts text with commas into list of strings.
-#    Cardinality: 1 .. * (one or more = many)
-#
-#    :param text:  Text to parse and convert (as string).
-#    :return: List of strings.
-#    """
-#
-#convert_list0 = TypeBuilder.with_many0(parse_anything, listsep=',')
-#convert_list0.name = "List0"
-#convert_list0.__doc__ = """\
-#    Converts text with commas into list of strings.
-#    Cardinality: 0 .. * (zero or more = many0)
-#
-#    :param text:  Text to parse and convert (as string).
-#    :return: List of strings.
-#    """
-#
-#convert_words = TypeBuilder.with_many(parse_anything, listsep=r'\s+')
-#convert_words.name = "Words"
-
-
-# -- AUTO-MAIN:
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
 
 # -----------------------------------------------------------------------------
 # Copyright (c) 2012-2013 by Jens Engel (https://github/jenisys/parse_type)

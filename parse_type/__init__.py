@@ -4,7 +4,7 @@ from parse_type.cardinality import Cardinality
 from parse_type.builder import TypeBuilder, build_type_dict
 
 __all__ = ["Cardinality", "TypeBuilder", "build_type_dict"]
-__version__ = "0.3.2"
+__version__ = "0.3.3"
 
 # -----------------------------------------------------------------------------
 # Copyright (c) 2012-2013 by Jens Engel (https://github/jenisys/)
