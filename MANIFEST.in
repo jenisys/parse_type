@@ -8,6 +8,7 @@ include *.txt
 include *.ini
 include *.cfg
 
+recursive-include bin           *.sh *.py
 recursive-include docs          *.rst *.txt *.py
 recursive-include requirements  *.txt
 recursive-include tests         *.py
