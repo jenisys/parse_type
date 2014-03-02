@@ -18,6 +18,7 @@
 
 from paver.easy import *
 import os
+import sys
 sys.path.insert(0, ".")
 
 # -- USE PAVER EXTENSIONS: tasks, utility functions
