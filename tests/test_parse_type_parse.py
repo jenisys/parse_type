@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # BASED-ON: https://github.com/r1chardj0n3s/parse/
-# VERSION:  parse 1.6.3
+# VERSION:  parse 1.6.4
 # Same as original "test_parse.py" test except that parse_type copy is used.
 # -- ORIGINAL-CODE STARTS-HERE ------------------------------------------------
 '''Test suite for parse.py
@@ -142,6 +142,11 @@ class TestParse(unittest.TestCase):
     def test_question_mark(self):
         # issue9: make sure a ? in the parse string is handled correctly
         r = parse.parse('"{}"?', '"teststr"?')
+        self.assertEqual(r[0], 'teststr')
+
+    def test_pipe(self):
+        # issue22: make sure a | in the parse string is handled correctly
+        r = parse.parse('| {}', '| teststr')
         self.assertEqual(r[0], 'teststr')
 
     def test_fixed(self):

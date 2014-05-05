@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # BASED-ON: https://github.com/r1chardj0n3s/parse/parse.py
-# VERSION:  parse 1.6.3
+# VERSION:  parse 1.6.4
 # Same as original parse module except the following extensions.
 # EXTENSIONS:
 #  * group_count attribute support for user-defined type converters
@@ -285,6 +285,7 @@ A more complete example of a custom type might be:
 
 **Version history (in brief)**:
 
+- 1.6.4 handle pipe "|" characters in parse string (thanks Martijn Pieters)
 - 1.6.3 handle repeated instances of named fields, fix bug in PM time
   overflow
 - 1.6.2 fix logging to use local, not root logger (thanks Necku)
@@ -328,7 +329,7 @@ A more complete example of a custom type might be:
 This code is copyright 2012-2013 Richard Jones <richard@python.org>
 See the end of the source file for the license of use.
 '''
-__version__ = '1.6.3'
+__version__ = '1.6.4'
 
 # yes, I now have two problems
 import re
@@ -548,7 +549,7 @@ class RepeatedNameError(ValueError):
 
 # note: {} are handled separately
 # note: I don't use r'' here because Sublime Text 2 syntax highlight has a fit
-REGEX_SAFETY = re.compile('([?\\\\.[\]()*+\^$!])')
+REGEX_SAFETY = re.compile('([?\\\\.[\]()*+\^$!\|])')
 
 # allowed field types
 ALLOWED_TYPES = set(list('nbox%fegwWdDsS') +
