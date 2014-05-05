@@ -10,3 +10,4 @@
 
 -r basic.txt
 -r develop.txt
+-r py26_more.txt

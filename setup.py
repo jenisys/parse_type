@@ -51,7 +51,7 @@ extra = dict(
     install_requires = requirements,
     tests_require = [],
     extras_require = {
-        'docs':    ["sphinx>=1.1"],
+        'docs':    ["sphinx>=1.2"],
         'develop': [
             "coverage", "pytest", "pytest-cov",
             "pytest-runner",
@@ -109,6 +109,7 @@ setup(
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Code Generators",
