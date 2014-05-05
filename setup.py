@@ -84,7 +84,7 @@ if USE_PYTEST_RUNNER:
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = "0.3.4",
+    version = "0.3.5dev",
     author = "Jens Engel",
     author_email = "jens_engel@nowhere.xxx",
     url = "https://github.com/jenisys/parse_type",
