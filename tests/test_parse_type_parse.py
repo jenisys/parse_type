@@ -11,6 +11,7 @@ See the end of the source file for the license of use.
 
 import unittest
 from datetime import datetime, time
+import re
 # XXX-ADAPT:
 # ORIG: import parse
 from parse_type import parse
@@ -611,8 +612,13 @@ class TestParse(unittest.TestCase):
         self.assertEqual(r.fixed[21], 'spam')
 
     def test_too_many_fields(self):
-        p = parse.compile('{:ti}' * 15)
-        self.assertRaises(parse.TooManyFields, p.parse, '')
+        # Python 3.5 removed the limit of 100 named groups in a regular expression,
+        # so only test for the exception if the limit exists.
+        try:
+            re.compile("".join("(?P<n{n}>{n}-)".format(n=i) for i in range(101)))
+        except AssertionError:
+            p = parse.compile('{:ti}' * 15)
+            self.assertRaises(parse.TooManyFields, p.parse, '')
 
 
 class TestSearch(unittest.TestCase):
