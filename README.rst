@@ -2,17 +2,21 @@
 parse_type
 ===============================================================================
 
-.. image:: https://pypip.in/v/parse_type/badge.png
-    :target: https://crate.io/packages/parse_type/
-    :alt: Latest PyPI version
-
-.. image:: https://pypip.in/d/parse_type/badge.png
-    :target: https://crate.io/packages/parse_type/
-    :alt: Number of PyPI downloads
-
-.. image:: https://travis-ci.org/jenisys/parse_type.png?branch=master
+.. image:: https://img.shields.io/travis/jenisys/parse_type/master.svg
     :target: https://travis-ci.org/jenisys/parse_type
     :alt: Travis CI Build Status
+
+.. image:: https://img.shields.io/pypi/v/parse_type.svg
+    :target: https://pypi.python.org/pypi/parse_type
+    :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/dm/parse_type.svg
+    :target: https://pypi.python.org/pypi/parse_type
+    :alt: Downloads
+
+.. image:: https://img.shields.io/pypi/l/parse_type.svg
+    :target: https://pypi.python.org/pypi/parse_type/
+    :alt: License
 
 
 `parse_type`_ extends the `parse`_ module (opposite of `string.format()`_)
