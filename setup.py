@@ -52,7 +52,7 @@ extra = dict(
         ],
         # -- SUPPORT-WHEELS: Extra packages for Python2.6
         # SEE: https://bitbucket.org/pypa/wheel/ , CHANGES.txt (v0.24.0)
-        ':python_version=="2.6"': ["enum34", "unittest2"],
+        ':python_version=="2.6"': ["enum34", "ordereddict", "unittest2"],
         ':python_version=="2.7"': ["enum34"],
         ':python_version=="3.2"': ["enum34"],
         ':python_version=="3.3"': ["enum34"],
