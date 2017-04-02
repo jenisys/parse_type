@@ -5,13 +5,11 @@ python:
   - 3.5
   - 3.4
   - 3.3
-  - 3.2
   - 2.6
   - pypy
 
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2 ordereddict; fi
   - python setup.py -q install
-  - pip install -U pytest
 script:
   - py.test tests
