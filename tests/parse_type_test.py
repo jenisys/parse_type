@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
 from parse_type import TypeBuilder
 from enum import Enum
 try:

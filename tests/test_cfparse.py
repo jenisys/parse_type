@@ -5,6 +5,7 @@
 Test suite to test the :mod:`parse_type.cfparse` module.
 """
 
+from __future__ import absolute_import
 from .parse_type_test import ParseTypeTestCase, parse_number, unittest
 from parse_type.cfparse import Parser
 from parse_type.cardinality_field \
