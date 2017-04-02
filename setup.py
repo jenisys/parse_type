@@ -20,13 +20,6 @@ import sys
 import os.path
 sys.path.insert(0, os.curdir)
 
-# -- BOOTSTRAP: setuptools
-USE_BOOTSTRAP = os.environ.get("PYSETUP_BOOTSTRAP", "no") == "yes"
-if USE_BOOTSTRAP:
-    from ez_setup import use_setuptools
-    use_setuptools()
-
-
 # -- USE: setuptools
 from setuptools import setup, find_packages
 
@@ -57,6 +50,12 @@ extra = dict(
             "coverage", "pytest", "pytest-cov",
             "tox",
         ],
+        # -- SUPPORT-WHEELS: Extra packages for Python2.6
+        # SEE: https://bitbucket.org/pypa/wheel/ , CHANGES.txt (v0.24.0)
+        ':python_version=="2.6"': ["enum34", "unittest2"],
+        ':python_version=="2.7"': ["enum34"],
+        ':python_version=="3.2"': ["enum34"],
+        ':python_version=="3.3"': ["enum34"],
     },
 
     test_suite = "tests",

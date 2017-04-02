@@ -1,5 +1,5 @@
 # ============================================================================
-# BEHAVE: PYTHON PACKAGE REQUIREMENTS: All requirements
+# INVOKE PYTHON PACKAGE REQUIREMENTS: For tasks
 # ============================================================================
 # DESCRIPTION:
 #    pip install -r <THIS_FILE>
@@ -8,6 +8,10 @@
 #  * http://www.pip-installer.org/
 # ============================================================================
 
--r basic.txt
--r develop.txt
--r py26_more.txt
+invoke >= 0.14.0
+six >= 1.10.0
+path.py >= 8.2.1
+pathlib;    python_version <= '3.4'
+
+# For cleanup of python files: py.cleanup
+pycmd

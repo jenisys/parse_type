@@ -9,9 +9,10 @@ include *.ini
 include *.cfg
 
 recursive-include bin           *.sh *.py
-recursive-include requirements  *.txt
+recursive-include py.requirements  *.txt
+recursive-include tasks         *.py *.txt *.rst *.zip
 recursive-include tests         *.py
-# DISABLED: recursive-include docs          *.rst *.txt *.py
+# -- DISABLED: recursive-include docs          *.rst *.txt *.py
 
 prune .tox
-
+prune .venv*
