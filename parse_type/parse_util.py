@@ -3,9 +3,11 @@
 Provides generic utility classes for the :class:`parse.Parser` class.
 """
 
+from __future__ import absolute_import
 import parse
 from collections import namedtuple
 import six
+
 
 # -- HELPER-CLASS: For format part in a Field.
 # REQUIRES: Python 2.6 or newer.

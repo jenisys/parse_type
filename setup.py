@@ -48,13 +48,13 @@ long_description = ''.join(open(README).readlines()[4:])
 extra = dict(
     # -- REQUIREMENTS:
     # setup_requires = ["setuptools>=1.0"],
+    # setup_requires=["pytest-runner"],
     install_requires = requirements,
-    tests_require = [],
+    tests_require=["pytest >= 3.0"],
     extras_require = {
-        'docs':    ["sphinx>=1.2"],
+        'docs': ["sphinx>=1.2"],
         'develop': [
             "coverage", "pytest", "pytest-cov",
-            "pytest-runner",
             "tox",
         ],
     },
@@ -74,7 +74,8 @@ if python_version >= 3.0:
 # # FILE: setup.cfg -- Use pytest-runner (ptr) as test runner.
 # [aliases]
 # test = ptr
-USE_PYTEST_RUNNER = os.environ.get("PYSETUP_TEST", "pytest") == "pytest"
+# USE_PYTEST_RUNNER = os.environ.get("PYSETUP_TEST", "pytest") == "pytest"
+USE_PYTEST_RUNNER = os.environ.get("PYSETUP_TEST", "no") == "pytest"
 if USE_PYTEST_RUNNER:
     extra["tests_require"].extend(["pytest", "pytest-runner"])
 
@@ -84,7 +85,7 @@ if USE_PYTEST_RUNNER:
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = "0.3.5dev",
+    version = "0.3.5.dev0",
     author = "Jens Engel",
     author_email = "jens_engel@nowhere.xxx",
     url = "https://github.com/jenisys/parse_type",
@@ -110,6 +111,8 @@ setup(
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Code Generators",

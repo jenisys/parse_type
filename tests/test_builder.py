@@ -6,6 +6,7 @@ Test suite  for parse_type.py
 REQUIRES: parse >= 1.5.3.1 ('pattern' attribute support)
 """
 
+from __future__ import absolute_import
 from .parse_type_test import ParseTypeTestCase
 from .parse_type_test \
     import parse_number, parse_yesno, parse_person_choice, parse_color, Color

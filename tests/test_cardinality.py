@@ -4,6 +4,7 @@
 Test suite to test the :mod:`parse_type.cardinality` module.
 """
 
+from __future__ import absolute_import
 from .parse_type_test import ParseTypeTestCase, parse_number
 from parse_type import Cardinality, TypeBuilder, build_type_dict
 from parse_type.parse import Parser as ParserExt

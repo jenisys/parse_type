@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 # BASED-ON: https://github.com/r1chardj0n3s/parse/
-# VERSION:  parse 1.6.4
+# VERSION:  parse 1.8.0
 # Same as original "test_parse.py" test except that parse_type copy is used.
 # -- ORIGINAL-CODE STARTS-HERE ------------------------------------------------
 '''Test suite for parse.py
@@ -9,12 +9,21 @@ This code is copyright 2011 eKit.com Inc (http://www.ekit.com/)
 See the end of the source file for the license of use.
 '''
 
+from __future__ import absolute_import
 import unittest
 from datetime import datetime, time
-# XXX-ADAPT:
-# ORIG: import parse
-from parse_type import parse
-# XXX-ADAPT-END
+import re
+
+# -- EXTENSION:
+import os
+PARSE_MODULE = os.environ.get("PARSE_TYPE_PARSE_MODULE", "parse_type.parse")
+if PARSE_MODULE.startswith("parse_type"):
+    # -- USE VENDOR MODULE: parse_type.parse (probably older that original)
+    from parse_type import parse
+else:
+    # -- USE ORIGINAL MODULE: parse
+    import parse
+# -- EXTENSION-END
 
 
 class TestPattern(unittest.TestCase):
@@ -82,12 +91,20 @@ class TestPattern(unittest.TestCase):
 
         _('.^010d', dict(type='d', width='10', align='^', fill='.',
             zero=True))
+        _('.2f', dict(type='f', precision='2'))
+        _('10.2f', dict(type='f', width='10', precision='2'))
 
     def test_dot_separated_fields(self):
         # this should just work and provide the named value
         res = parse.parse('{hello.world}_{jojo.foo.baz}_{simple}', 'a_b_c')
         assert res.named['hello.world'] == 'a'
         assert res.named['jojo.foo.baz'] == 'b'
+        assert res.named['simple'] == 'c'
+
+    def test_dict_style_fields(self):
+        res = parse.parse('{hello[world]}_{hello[foo][baz]}_{simple}', 'a_b_c')
+        assert res.named['hello']['world'] == 'a'
+        assert res.named['hello']['foo']['baz'] == 'b'
         assert res.named['simple'] == 'c'
 
     def test_dot_separated_fields_name_collisions(self):
@@ -128,6 +145,12 @@ class TestParse(unittest.TestCase):
         r = parse.parse('{{hello}}', '{hello}')
         self.assertEqual(r.fixed, ())
         self.assertEqual(r.named, {})
+
+    def test_no_evaluate_result(self):
+        # pull a fixed value out of string
+        match = parse.parse('hello {}', 'hello world', evaluate_result=False)
+        r = match.evaluate_result()
+        self.assertEqual(r.fixed, ('world', ))
 
     def test_regular_expression(self):
         # match an actual regular expression
@@ -176,6 +199,19 @@ class TestParse(unittest.TestCase):
         r = parse.parse('hello {:w} {:w}', 'hello 12 people')
         self.assertEqual(r.fixed, ('12', 'people'))
 
+    def test_precision(self):
+        # pull a float out of a string
+        r = parse.parse('Pi = {:.7f}', 'Pi = 3.1415926')
+        self.assertEqual(r.fixed, (3.1415926, ))
+        r = parse.parse('Pi/10 = {:8.5f}', 'Pi/10 =  0.31415')
+        self.assertEqual(r.fixed, (0.31415, ))
+
+    def test_precision_fail(self):
+        # floats must have a leading zero
+        # IS THIS CORRECT?
+        r = parse.parse('Pi/10 = {:8.5f}', 'Pi/10 = .31415')
+        self.assertEqual(r, None)
+
     def test_custom_type(self):
         # use a custom type
         r = parse.parse('{:shouty} {:spam}', 'hello world',
@@ -217,7 +253,7 @@ class TestParse(unittest.TestCase):
         r = parse.parse('{n:d} {n:d}', '1 2')
         self.assertEqual(r, None)
 
-    def test_named_repeated_type_fail_value(self):
+    def test_named_repeated_type_mismatch(self):
         # test repeated name with mismatched type
         self.assertRaises(parse.RepeatedNameError, parse.compile,
             '{n:d} {n:w}')
@@ -466,6 +502,11 @@ class TestParse(unittest.TestCase):
         y('a {:ta} b', 'a November-21-2011 10:21:36 AM +1000 b', aest_d)
         y('a {:ta} b', 'a November-21-2011 b', d)
 
+        # ts   Linux System log format        datetime
+        y('a {:ts} b', 'a Nov 21 10:21:36 b',  datetime(datetime.today().year, 11, 21, 10, 21, 36))
+        y('a {:ts} b', 'a Nov  1 10:21:36 b',  datetime(datetime.today().year, 11, 1, 10, 21, 36))
+        y('a {:ts} b', 'a Nov  1 03:21:36 b',  datetime(datetime.today().year, 11, 1, 3, 21, 36))
+
         # th   HTTP log format date/time                   datetime
         y('a {:th} b', 'a 21/Nov/2011:10:21:36 +1000 b', aest_d)
         y('a {:th} b', 'a 21/Nov/2011:10:21:36 +10:00 b', aest_d)
@@ -611,8 +652,13 @@ class TestParse(unittest.TestCase):
         self.assertEqual(r.fixed[21], 'spam')
 
     def test_too_many_fields(self):
-        p = parse.compile('{:ti}' * 15)
-        self.assertRaises(parse.TooManyFields, p.parse, '')
+        # Python 3.5 removed the limit of 100 named groups in a regular expression,
+        # so only test for the exception if the limit exists.
+        try:
+            re.compile("".join("(?P<n{n}>{n}-)".format(n=i) for i in range(101)))
+        except AssertionError:
+            p = parse.compile('{:ti}' * 15)
+            self.assertRaises(parse.TooManyFields, p.parse, '')
 
 
 class TestSearch(unittest.TestCase):
@@ -631,12 +677,24 @@ class TestSearch(unittest.TestCase):
         r = parse.search('a {} c', ' a b c ', 2)
         self.assertEqual(r, None)
 
+    def test_no_evaluate_result(self):
+        match = parse.search('age: {:d}\n', 'name: Rufus\nage: 42\ncolor: red\n', evaluate_result=False)
+        r = match.evaluate_result()
+        self.assertEqual(r.fixed, (42,))
+
+
 
 class TestFindall(unittest.TestCase):
     def test_findall(self):
         # basic findall() test
         s = ''.join(r.fixed[0] for r in parse.findall(">{}<",
             "<p>some <b>bold</b> text</p>"))
+        self.assertEqual(s, "some bold text")
+
+    def test_no_evaluate_result(self):
+        # basic findall() test
+        s = ''.join(m.evaluate_result().fixed[0] for m in parse.findall(">{}<",
+            "<p>some <b>bold</b> text</p>", evaluate_result=False))
         self.assertEqual(s, "some bold text")
 
 
