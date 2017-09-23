@@ -4,7 +4,7 @@
 Test suite to test the :mod:`parse_type.parse_util` module.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 from .parse_type_test import TestCase, unittest
 from parse_type.parse_util \
     import Field, FieldParser, FormatSpec, make_format_spec
@@ -144,7 +144,7 @@ class TestFieldFormatSpec(TestCase):
     Test Field.extract_format_spec().
 
     FORMAT-SPEC SCHEMA:
-    [[fill]align][0][width][type]
+    [[fill]align][0][width][.precision][type]
     """
 
     def assertValidFormatWidth(self, width):
@@ -156,6 +156,11 @@ class TestFieldFormatSpec(TestCase):
         self.assertIsInstance(align, str)
         self.assertEqual(len(align), 1)
         self.assertIn(align, Field.ALIGN_CHARS)
+
+    def assertValidFormatPrecision(self, precision):
+        self.assertIsInstance(precision, str)
+        for char in precision:
+            self.assertTrue(char.isdigit())
 
     def test_extract_format_spec__with_empty_string_raises_error(self):
         with self.assertRaises(ValueError) as cm:
@@ -215,6 +220,17 @@ class TestFieldFormatSpec(TestCase):
             self.assertEqual(format_spec, expected_spec)
             self.assertValidFormatWidth(format_spec.width)
 
+    def test_extract_format_spec__with_precision_and_type(self):
+        formats = [".2d", ".6s", ".6f"]
+        for format in formats:
+            format_spec = Field.extract_format_spec(format)
+            expected_type  = format[-1]
+            expected_precision = format[1:-1]
+            expected_spec = make_format_spec(type=expected_type,
+                                             precision=expected_precision)
+            self.assertEqual(format_spec, expected_spec)
+            self.assertValidFormatPrecision(format_spec.precision)
+
     def test_extract_format_spec__with_zero_and_type(self):
         formats = ["0s", "0d", "0Number", "0Number+"]
         for format in formats:
@@ -260,6 +276,12 @@ class TestFieldFormatSpec(TestCase):
                                         zero=False, align="=", fill="*")),
             ("X129Number?", make_format_spec(type="X129Number?", width="",
                                         zero=False, align=None, fill=None)),
+            (".3Number", make_format_spec(type="Number", width="",
+                                           zero=False, align=None, fill=None,
+                                           precision="3")),
+            ("6.2Number", make_format_spec(type="Number", width="6",
+                                      zero=False, align=None, fill=None,
+                                      precision="2")),
     ]
 
     def test_extract_format_spec__with_all(self):
