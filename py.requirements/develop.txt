@@ -14,6 +14,11 @@ pycmd
 # -- PROJECT ADMIN SUPPORT:
 bumpversion
 
+# -- PYTHON2/PYTHON3 COMPATIBILITY:
+modernize >= 0.5
+
+pylint
+
 # -- RELATED:
 -r testing.txt
 -r docs.txt
