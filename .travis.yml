@@ -1,16 +1,19 @@
 language: python
+sudo: false
 python:
-  - 3.6
-  - 2.7
-  - 3.5
-  - 3.4
-  - 3.3
-  - 2.6
-  - pypy
+  - "3.6"
+  - "2.7"
+  - "3.5"
+  - "3.4"
+  - "3.3"
+  - "2.6"
+  - "pypy"
+  - "pypy3"
 
 install:
+  - echo "TRAVIS_PYTHON_VERSION=${TRAVIS_PYTHON_VERSION}"
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2 ordereddict; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then pip install pytest>=3.0 ; fi
   - python setup.py -q install
 script:
-  - py.test tests
+  - pytest tests
