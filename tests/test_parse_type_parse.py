@@ -1,7 +1,9 @@
-# -*- coding: UTF-8 -*-
-# BASED-ON: https://github.com/r1chardj0n3s/parse/
-# VERSION:  parse 1.8.0
-# Same as original "test_parse.py" test except that parse_type copy is used.
+# -*- encoding: utf8 -*-
+# -- BASED-ON: https://github.com/r1chardj0n3s/parse/test_parse.py
+# VERSION:  parse 1.8.2
+# Same as original file but uses bundled :mod:`parse_type.parse` module
+# instead of :mod:`parse` module
+#
 # -- ORIGINAL-CODE STARTS-HERE ------------------------------------------------
 '''Test suite for parse.py
 
@@ -11,6 +13,11 @@ See the end of the source file for the license of use.
 
 from __future__ import absolute_import
 import unittest
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
+# -- ADAPTATION-END
 from datetime import datetime, time
 import re
 
@@ -171,6 +178,16 @@ class TestParse(unittest.TestCase):
         # issue22: make sure a | in the parse string is handled correctly
         r = parse.parse('| {}', '| teststr')
         self.assertEqual(r[0], 'teststr')
+
+    def test_unicode(self):
+        # issue29: make sure unicode is parsable
+        r = parse.parse('{}', u't€ststr')
+        self.assertEqual(r[0], u't€ststr')
+
+    def test_hexadecimal(self):
+        # issue42: make sure bare hexadecimal isn't matched as "digits"
+        r = parse.parse('{:d}', 'abcdef')
+        self.assertIsNone(r)
 
     def test_fixed(self):
         # pull a fixed value out of string
