@@ -2,14 +2,15 @@
 # PYTHON PACKAGE REQUIREMENTS FOR: parse_type -- For testing only
 # ============================================================================
 
-pytest
-pytest-html
+pytest >= 3.2
+pytest-html >= 1.16
 pytest-cov
 pytest-runner
-unittest2
+# -- PYTHON 2.6 SUPPORT:
+unittest2;    python_version <= '2.6'
 
-tox   >= 2.6.0
-coverage >= 3.7
+tox   >= 2.8
+coverage >= 4.4
 
 # -- NEEDED-FOR: toxcmd.py
 argparse

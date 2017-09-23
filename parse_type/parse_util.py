@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=missing-docstring
 """
 Provides generic utility classes for the :class:`parse.Parser` class.
 """
 
 from __future__ import absolute_import
-import parse
 from collections import namedtuple
+import parse
 import six
 
 
 # -- HELPER-CLASS: For format part in a Field.
 # REQUIRES: Python 2.6 or newer.
+# pylint: disable=redefined-builtin, too-many-arguments
 FormatSpec = namedtuple("FormatSpec",
-                        ["type", "width", "zero", "align", "fill"])
+                        ["type", "width", "zero", "align", "fill", "precision"])
 
-def make_format_spec(type=None, width="", zero=False, align=None, fill=None):
-    return FormatSpec(type, width, zero, align, fill)
-
+def make_format_spec(type=None, width="", zero=False, align=None, fill=None,
+                     precision=None):
+    return FormatSpec(type, width, zero, align, fill, precision)
+# pylint: enable=redefined-builtin
 
 class Field(object):
     """
@@ -28,8 +31,9 @@ class Field(object):
         * "{:format}"
         * "{name:format}"
 
-    Format specification: [[fill]align][0][width][type]
+    Format specification: [[fill]align][0][width][.precision][type]
     """
+    # pylint: disable=redefined-builtin
     ALIGN_CHARS = '<>=^'
 
     def __init__(self, name="", format=None):
@@ -55,8 +59,7 @@ class Field(object):
         name = self.name or ""
         if self.has_format:
             return "{%s:%s}" % (name, self.format)
-        else:
-            return "{%s}" % name
+        return "{%s}" % name
 
     def __eq__(self, other):
         if isinstance(other, Field):
@@ -88,13 +91,21 @@ class Field(object):
                 fill = format_spec.fill[0]
         if format_spec.zero:
             zero = '0'
-        # -- FORMAT-SPEC: [[fill]align][0][width][type]
-        return "%s%s%s%s%s" % (fill, align, zero, width, format_spec.type)
+
+        precision_part = ""
+        if format_spec.precision:
+            precision_part = ".%s" % format_spec.precision
+
+        # -- FORMAT-SPEC: [[fill]align][0][width][.precision][type]
+        return "%s%s%s%s%s%s" % (fill, align, zero, width,
+                                 precision_part, format_spec.type)
+
 
     @classmethod
     def extract_format_spec(cls, format):
-        """Pull apart the format [[fill]align][0][width][type]"""
+        """Pull apart the format: [[fill]align][0][width][.precision][type]"""
         # -- BASED-ON: parse.extract_format()
+        # pylint: disable=redefined-builtin, unsubscriptable-object
         if not format:
             raise ValueError("INVALID-FORMAT: %s (empty-string)" % format)
 
@@ -120,11 +131,23 @@ class Field(object):
             width += format[0]
             format = format[1:]
 
+        precision = None
+        if format.startswith('.'):
+            # Precision isn't needed but we need to capture it so that
+            # the ValueError isn't raised.
+            format = format[1:]  # drop the '.'
+            precision = ''
+            while format:
+                if not format[0].isdigit():
+                    break
+                precision += format[0]
+                format = format[1:]
+
         # the rest is the type, if present
         type = format
         if not type:
             raise ValueError("INVALID-FORMAT: %s (without type)" % orig_format)
-        return FormatSpec(type, width, zero, align, fill)
+        return FormatSpec(type, width, zero, align, fill, precision)
 
 
 class FieldParser(object):
@@ -142,16 +165,15 @@ class FieldParser(object):
         text = text[1:-1]
         if ':' in text:
             # -- CASE: Typed field with format.
-            name, format = text.split(':')
+            name, format_ = text.split(':')
         else:
             name = text
-            format = None
-        return Field(name, format)
+            format_ = None
+        return Field(name, format_)
 
     @classmethod
     def extract_fields(cls, schema):
-        """
-        Extract fields in a parse expression schema.
+        """Extract fields in a parse expression schema.
 
         :param schema: Parse expression schema/format to use (as string).
         :return: Generator for fields in schema (as Field objects).
@@ -166,8 +188,7 @@ class FieldParser(object):
 
     @classmethod
     def extract_types(cls, schema):
-        """
-        Extract types (names) for typed fields (with format/type part).
+        """Extract types (names) for typed fields (with format/type part).
 
         :param schema: Parser schema/format to use.
         :return: Generator for type names (as string).

@@ -3,8 +3,8 @@
 # ============================================================================
 
 # -- DEVELOPMENT SUPPORT:
-invoke >= 0.14.0
-six >= 1.10.0
+invoke >= 0.21.0
+six >= 1.11.0
 path.py >= 8.2.1
 pathlib;    python_version <= '3.4'
 
@@ -13,6 +13,11 @@ pycmd
 
 # -- PROJECT ADMIN SUPPORT:
 bumpversion
+
+# -- PYTHON2/PYTHON3 COMPATIBILITY:
+modernize >= 0.5
+
+pylint
 
 # -- RELATED:
 -r testing.txt

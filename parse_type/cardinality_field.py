@@ -19,14 +19,11 @@ class MissingTypeError(KeyError):
 # CLASS: Cardinality (Field Part)
 # -----------------------------------------------------------------------------
 class CardinalityField(object):
-    """
-    Cardinality field for parse format expression, ala:
+    """Cardinality field for parse format expression, ala:
 
         "{person:Person?}"   #< Cardinality: 0..1 = zero or one  = optional
         "{persons:Person*}"  #< Cardinality: 0..* = zero or more = many0
         "{persons:Person+}"  #< Cardinality: 1..* = one  or more = many
-
-    STATUS: IDEA, currently not accepted in :mod:`parse` module.
     """
 
     # -- MAPPING SUPPORT:
@@ -40,8 +37,7 @@ class CardinalityField(object):
 
     @classmethod
     def matches_type(cls, type_name):
-        """
-        Checks if a type name uses the CardinalityField naming scheme.
+        """Checks if a type name uses the CardinalityField naming scheme.
 
         :param type_name:  Type name to check (as string).
         :return: True, if type name has CardinalityField name suffix.
@@ -50,8 +46,7 @@ class CardinalityField(object):
 
     @classmethod
     def split_type(cls, type_name):
-        """
-        Split type of a type name with CardinalityField suffix into its parts.
+        """Split type of a type name with CardinalityField suffix into its parts.
 
         :param type_name:  Type name (as string).
         :return: Tuple (type_basename, cardinality)
@@ -67,8 +62,7 @@ class CardinalityField(object):
 
     @classmethod
     def make_type(cls, basename, cardinality):
-        """
-        Build new type name according to CardinalityField naming scheme.
+        """Build new type name according to CardinalityField naming scheme.
 
         :param basename:  Type basename of primary type (as string).
         :param cardinality: Cardinality of the new type (as Cardinality item).
@@ -87,8 +81,7 @@ class CardinalityField(object):
 # CLASS: CardinalityFieldTypeBuilder
 # -----------------------------------------------------------------------------
 class CardinalityFieldTypeBuilder(object):
-    """
-    Utility class to create type converters based on:
+    """Utility class to create type converters based on:
 
       * the CardinalityField naming scheme and
       * type converter for cardinality=1

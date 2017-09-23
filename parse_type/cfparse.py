@@ -15,8 +15,7 @@ log = logging.getLogger(__name__)
 
 
 class Parser(parse.Parser):
-    """
-    Provides an extended :class:`parse.Parser` with cardinality field support.
+    """Provides an extended :class:`parse.Parser` with cardinality field support.
     A cardinality field is a type suffix for parse format expression, ala:
 
         "... {person:Person?} ..."   -- OPTIONAL: Cardinality zero or one, 0..1
@@ -34,8 +33,7 @@ class Parser(parse.Parser):
     type_builder = CardinalityFieldTypeBuilder
 
     def __init__(self, schema, extra_types={}, type_builder=None):
-        """
-        Creates a parser with CardinalityField part support.
+        """Creates a parser with CardinalityField part support.
 
         :param schema:  Parse schema (or format) for parser (as string).
         :param extra_types:  Type dictionary with type converters.
@@ -51,8 +49,7 @@ class Parser(parse.Parser):
 
     @classmethod
     def create_missing_types(cls, schema, type_dict, type_builder=None):
-        """
-        Creates missing types for fields with a CardinalityField part.
+        """Creates missing types for fields with a CardinalityField part.
         It is assumed that the primary type converter for cardinality=1
         is registered in the type dictionary.
 
@@ -71,8 +68,7 @@ class Parser(parse.Parser):
 
     @staticmethod
     def extract_missing_special_type_names(schema, type_dict):
-        """
-        Extract the type names for fields with CardinalityField part.
+        """Extract the type names for fields with CardinalityField part.
         Selects only the missing type names that are not in the type dictionary.
 
         :param schema:     Parse schema to use (as string).
