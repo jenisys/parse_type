@@ -1,18 +1,20 @@
 # -*- coding: UTF-8 -*-
 # BASED-ON: https://github.com/r1chardj0n3s/parse/parse.py
-# VERSION:  parse 1.8.0
+# VERSION:  parse 1.8.2
 # Same as original parse module except the following extensions.
 # EXTENSIONS:
 #  * group_count attribute support for user-defined type converters
 #     => FIXES: group_index offset problem for fixed fields
 #        when pattern has groups
+#  * raise StopIteration() instead of StopIteration (as class)
+#
 # -- ORIGINAL-CODE STARTS-HERE ------------------------------------------------
 r'''Parse strings using a specification based on the Python format() syntax.
 
    ``parse()`` is the opposite of ``format()``
 
-The module is set up to only export ``parse()``, ``search()`` and
-``findall()`` when ``import *`` is used:
+The module is set up to only export ``parse()``, ``search()``, ``findall()``,
+and ``with_pattern()`` when ``import *`` is used:
 
 >>> from parse import *
 
@@ -300,6 +302,8 @@ A more complete example of a custom type might be:
 
 **Version history (in brief)**:
 
+- 1.8.2 clarify message on invalid format specs (thanks Rick Teachey)
+- 1.8.1 ensure bare hexadecimal digits are not matched
 - 1.8.0 support manual control over result evaluation (thanks Timo Furrer)
 - 1.7.0 parse dict fields (thanks Mark Visser) and adapted to allow
   more than 100 re groups in Python 3.5+ (thanks David King)
@@ -349,7 +353,7 @@ A more complete example of a custom type might be:
 This code is copyright 2012-2017 Richard Jones <richard@python.org>
 See the end of the source file for the license of use.
 '''
-__version__ = '1.8.0'
+__version__ = '1.8.2'
 
 # yes, I now have two problems
 import re
@@ -618,7 +622,7 @@ def extract_format(format, extra_types):
     # the rest is the type, if present
     type = format
     if type and type not in ALLOWED_TYPES and type not in extra_types:
-        raise ValueError('type %r not recognised' % type)
+        raise ValueError('format spec %r not recognised' % type)
 
     return locals()
 
@@ -629,7 +633,7 @@ PARSE_RE = re.compile(r"""({{|}}|{\w*(?:(?:\.\w+)|(?:\[[^\]]+\]))*(?::[^}]+)?})"
 class Parser(object):
     '''Encapsulate a format string that may be used to parse other strings.
     '''
-    def __init__(self, format, extra_types={}):
+    def __init__(self, format, extra_types=None):
         # a mapping of a name as in {hello.world} to a regex-group compatible
         # name, like hello__world Its used to prevent the transformation of
         # name-to-group and group to name to fail subtly, such as in:
@@ -643,6 +647,8 @@ class Parser(object):
         self._name_types = {}
 
         self._format = format
+        if extra_types is None:
+            extra_types = {}
         self._extra_types = extra_types
         self._fixed_fields = []
         self._named_fields = []
@@ -652,7 +658,7 @@ class Parser(object):
         self.__search_re = None
         self.__match_re = None
 
-        log.debug('format %r -> %r' % (format, self._expression))
+        log.debug('format %r -> %r', format, self._expression)
 
     def __repr__(self):
         if len(self._format) > 20:
@@ -730,8 +736,8 @@ class Parser(object):
         else:
             return Match(self, m)
 
-    def findall(self, string, pos=0, endpos=None, extra_types={}, evaluate_result=True):
-        '''Search "string" for the all occurrances of "format".
+    def findall(self, string, pos=0, endpos=None, extra_types=None, evaluate_result=True):
+        '''Search "string" for all occurrences of "format".
 
         Optionally start the search at "pos" character index and limit the
         search to a maximum index of endpos - equivalent to
@@ -830,7 +836,7 @@ class Parser(object):
             elif '_' in field:
                 group = field.replace('_', '_' * n)
             else:
-                raise KeyError('duplicated group name %r' % (field, ))
+                raise KeyError('duplicated group name %r' % (field,))
 
         # save off the mapping
         self._group_to_name_map[group] = field
@@ -923,7 +929,7 @@ class Parser(object):
             self._group_index += 2
             self._type_conversions[group] = lambda s, m: float(s)
         elif type == 'd':
-            s = r'\d+|0[xX][0-9a-fA-F]+|[0-9a-fA-F]+|0[bB][01]+|0[oO][0-7]+'
+            s = r'\d+|0[xX][0-9a-fA-F]+|0[bB][01]+|0[oO][0-7]+'
             self._type_conversions[group] = int_convert(10)
         elif type == 'ti':
             s = r'(\d{4}-\d\d-\d\d)((\s+|T)%s)?(Z|\s*[-+]\d\d:?\d\d)?' % \
@@ -976,7 +982,7 @@ class Parser(object):
                 am=n + 4, tz=n + 5)
             self._group_index += 5
         elif type == 'ts':
-            s = r'%s(\s+)(\d+)(\s+)(\d{1,2}:\d{1,2}:\d{1,2})?' % (MONTHS_PAT)
+            s = r'%s(\s+)(\d+)(\s+)(\d{1,2}:\d{1,2}:\d{1,2})?' % MONTHS_PAT
             n = self._group_index
             self._type_conversions[group] = partial(date_convert, mm=n+1, dd=n+3,
                 hms=n + 5)
@@ -1102,7 +1108,7 @@ class ResultIterator(object):
     next = __next__
 
 
-def parse(format, string, extra_types={}, evaluate_result=True):
+def parse(format, string, extra_types=None, evaluate_result=True):
     '''Using "format" attempt to pull values from "string".
 
     The format must match the string contents exactly. If the value
@@ -1128,8 +1134,8 @@ def parse(format, string, extra_types={}, evaluate_result=True):
     return Parser(format, extra_types=extra_types).parse(string, evaluate_result=evaluate_result)
 
 
-def search(format, string, pos=0, endpos=None, extra_types={}, evaluate_result=True):
-    '''Search "string" for the first occurance of "format".
+def search(format, string, pos=0, endpos=None, extra_types=None, evaluate_result=True):
+    '''Search "string" for the first occurrence of "format".
 
     The format may occur anywhere within the string. If
     instead you wish for the format to exactly match the string
@@ -1157,8 +1163,8 @@ def search(format, string, pos=0, endpos=None, extra_types={}, evaluate_result=T
     return Parser(format, extra_types=extra_types).search(string, pos, endpos, evaluate_result=evaluate_result)
 
 
-def findall(format, string, pos=0, endpos=None, extra_types={}, evaluate_result=True):
-    '''Search "string" for the all occurrances of "format".
+def findall(format, string, pos=0, endpos=None, extra_types=None, evaluate_result=True):
+    '''Search "string" for all occurrences of "format".
 
     You will be returned an iterator that holds Result instances
     for each format match found.
@@ -1183,7 +1189,7 @@ def findall(format, string, pos=0, endpos=None, extra_types={}, evaluate_result=
     return Parser(format, extra_types=extra_types).findall(string, pos, endpos, evaluate_result=evaluate_result)
 
 
-def compile(format, extra_types={}):
+def compile(format, extra_types=None):
     '''Create a Parser instance to parse "format".
 
     The resultant Parser has a method .parse(string) which

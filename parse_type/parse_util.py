@@ -28,7 +28,7 @@ class Field(object):
         * "{:format}"
         * "{name:format}"
 
-    Format specification: [[fill]align][0][width][type]
+    Format specification: [[fill]align][0][width][.precision][type]
     """
     ALIGN_CHARS = '<>=^'
 
@@ -88,12 +88,13 @@ class Field(object):
                 fill = format_spec.fill[0]
         if format_spec.zero:
             zero = '0'
-        # -- FORMAT-SPEC: [[fill]align][0][width][type]
+        # -- FORMAT-SPEC: [[fill]align][0][width][.precision][type]
+        # TODO: precision, not handled yet.
         return "%s%s%s%s%s" % (fill, align, zero, width, format_spec.type)
 
     @classmethod
     def extract_format_spec(cls, format):
-        """Pull apart the format [[fill]align][0][width][type]"""
+        """Pull apart the format: [[fill]align][0][width][.precision][type]"""
         # -- BASED-ON: parse.extract_format()
         if not format:
             raise ValueError("INVALID-FORMAT: %s (empty-string)" % format)
@@ -119,6 +120,17 @@ class Field(object):
                 break
             width += format[0]
             format = format[1:]
+
+        if format.startswith('.'):
+            # Precision isn't needed but we need to capture it so that
+            # the ValueError isn't raised.
+            format = format[1:]  # drop the '.'
+            precision = ''
+            while format:
+                if not format[0].isdigit():
+                    break
+                precision += format[0]
+                format = format[1:]
 
         # the rest is the type, if present
         type = format
@@ -150,8 +162,7 @@ class FieldParser(object):
 
     @classmethod
     def extract_fields(cls, schema):
-        """
-        Extract fields in a parse expression schema.
+        """Extract fields in a parse expression schema.
 
         :param schema: Parse expression schema/format to use (as string).
         :return: Generator for fields in schema (as Field objects).
@@ -166,8 +177,7 @@ class FieldParser(object):
 
     @classmethod
     def extract_types(cls, schema):
-        """
-        Extract types (names) for typed fields (with format/type part).
+        """Extract types (names) for typed fields (with format/type part).
 
         :param schema: Parser schema/format to use.
         :return: Generator for type names (as string).
