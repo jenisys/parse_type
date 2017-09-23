@@ -18,8 +18,7 @@ def pattern_group_count(pattern):
 # CLASS: Cardinality (Enum Class)
 # -----------------------------------------------------------------------------
 class Cardinality(Enum):
-    """
-    Cardinality enumeration class to simplify building regular expression
+    """Cardinality enumeration class to simplify building regular expression
     patterns for a data type with the specified cardinality.
     """
     __order__ = "one, zero_or_one, zero_or_more, one_or_more"
@@ -38,16 +37,15 @@ class Cardinality(Enum):
         self.group_count = group_count  #< Number of match groups.
 
     def is_many(self):
-        """
-        Checks for a more general interpretation of "many".
+        """Checks for a more general interpretation of "many".
+
         :return: True, if Cardinality.zero_or_more or Cardinality.one_or_more.
         """
         return ((self is Cardinality.zero_or_more) or
                 (self is Cardinality.one_or_more))
 
     def make_pattern(self, pattern, listsep=','):
-        """
-        Make pattern for a data type with the specified cardinality.
+        """Make pattern for a data type with the specified cardinality.
 
         .. code-block:: python
 
@@ -66,8 +64,7 @@ class Cardinality(Enum):
             return self.schema % (pattern, listsep, pattern)
 
     def compute_group_count(self, pattern):
-        """
-        Compute the number of regexp match groups when the pattern is provided
+        """Compute the number of regexp match groups when the pattern is provided
         to the :func:`Cardinality.make_pattern()` method.
 
         :param pattern: Item regexp pattern (as string).
@@ -84,8 +81,7 @@ class Cardinality(Enum):
 # CLASS: TypeBuilder
 # -----------------------------------------------------------------------------
 class TypeBuilder(object):
-    """
-    Provides a utility class to build type-converters (parse_types) for parse.
+    """Provides a utility class to build type-converters (parse_types) for parse.
     It supports to build new type-converters for different cardinality
     based on the type-converter for cardinality one.
     """
@@ -97,8 +93,7 @@ class TypeBuilder(object):
     @classmethod
     def with_cardinality(cls, cardinality, converter, pattern=None,
                          listsep=','):
-        """
-        Creates a type converter for the specified cardinality
+        """Creates a type converter for the specified cardinality
         by using the type converter for T.
 
         :param cardinality: Cardinality to use (0..1, 0..*, 1..*).
@@ -118,8 +113,7 @@ class TypeBuilder(object):
 
     @classmethod
     def with_zero_or_one(cls, converter, pattern=None):
-        """
-        Creates a type converter for a T with 0..1 times
+        """Creates a type converter for a T with 0..1 times
         by using the type converter for one item of T.
 
         :param converter: Type converter (function) for data type T.
@@ -144,8 +138,7 @@ class TypeBuilder(object):
 
     @classmethod
     def with_zero_or_more(cls, converter, pattern=None, listsep=","):
-        """
-        Creates a type converter function for a list<T> with 0..N items
+        """Creates a type converter function for a list<T> with 0..N items
         by using the type converter for one item of T.
 
         :param converter: Type converter (function) for data type T.
@@ -171,8 +164,7 @@ class TypeBuilder(object):
 
     @classmethod
     def with_one_or_more(cls, converter, pattern=None, listsep=","):
-        """
-        Creates a type converter function for a list<T> with 1..N items
+        """Creates a type converter function for a list<T> with 1..N items
         by using the type converter for one item of T.
 
         :param converter: Type converter (function) for data type T.
