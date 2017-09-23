@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=missing-docstring
 """
 Provides generic utility classes for the :class:`parse.Parser` class.
 """
 
 from __future__ import absolute_import
-import parse
 from collections import namedtuple
+import parse
 import six
 
 
 # -- HELPER-CLASS: For format part in a Field.
 # REQUIRES: Python 2.6 or newer.
+# pylint: disable=redefined-builtin, too-many-arguments
 FormatSpec = namedtuple("FormatSpec",
-                        ["type", "width", "zero", "align", "fill"])
+                        ["type", "width", "zero", "align", "fill", "precision"])
 
-def make_format_spec(type=None, width="", zero=False, align=None, fill=None):
-    return FormatSpec(type, width, zero, align, fill)
-
+def make_format_spec(type=None, width="", zero=False, align=None, fill=None,
+                     precision=None):
+    return FormatSpec(type, width, zero, align, fill, precision)
+# pylint: enable=redefined-builtin
 
 class Field(object):
     """
@@ -30,6 +33,7 @@ class Field(object):
 
     Format specification: [[fill]align][0][width][.precision][type]
     """
+    # pylint: disable=redefined-builtin
     ALIGN_CHARS = '<>=^'
 
     def __init__(self, name="", format=None):
@@ -55,8 +59,7 @@ class Field(object):
         name = self.name or ""
         if self.has_format:
             return "{%s:%s}" % (name, self.format)
-        else:
-            return "{%s}" % name
+        return "{%s}" % name
 
     def __eq__(self, other):
         if isinstance(other, Field):
@@ -88,14 +91,21 @@ class Field(object):
                 fill = format_spec.fill[0]
         if format_spec.zero:
             zero = '0'
+
+        precision_part = ""
+        if format_spec.precision:
+            precision_part = ".%s" % format_spec.precision
+
         # -- FORMAT-SPEC: [[fill]align][0][width][.precision][type]
-        # TODO: precision, not handled yet.
-        return "%s%s%s%s%s" % (fill, align, zero, width, format_spec.type)
+        return "%s%s%s%s%s%s" % (fill, align, zero, width,
+                                 precision_part, format_spec.type)
+
 
     @classmethod
     def extract_format_spec(cls, format):
         """Pull apart the format: [[fill]align][0][width][.precision][type]"""
         # -- BASED-ON: parse.extract_format()
+        # pylint: disable=redefined-builtin, unsubscriptable-object
         if not format:
             raise ValueError("INVALID-FORMAT: %s (empty-string)" % format)
 
@@ -121,6 +131,7 @@ class Field(object):
             width += format[0]
             format = format[1:]
 
+        precision = None
         if format.startswith('.'):
             # Precision isn't needed but we need to capture it so that
             # the ValueError isn't raised.
@@ -136,7 +147,7 @@ class Field(object):
         type = format
         if not type:
             raise ValueError("INVALID-FORMAT: %s (without type)" % orig_format)
-        return FormatSpec(type, width, zero, align, fill)
+        return FormatSpec(type, width, zero, align, fill, precision)
 
 
 class FieldParser(object):
@@ -154,11 +165,11 @@ class FieldParser(object):
         text = text[1:-1]
         if ':' in text:
             # -- CASE: Typed field with format.
-            name, format = text.split(':')
+            name, format_ = text.split(':')
         else:
             name = text
-            format = None
-        return Field(name, format)
+            format_ = None
+        return Field(name, format_)
 
     @classmethod
     def extract_fields(cls, schema):

@@ -5,6 +5,7 @@ for a data type with the specified cardinality.
 """
 
 # -- USE: enum34
+from __future__ import absolute_import
 from enum import Enum
 
 # -----------------------------------------------------------------------------

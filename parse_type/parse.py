@@ -8,7 +8,14 @@
 #        when pattern has groups
 #  * raise StopIteration() instead of StopIteration (as class)
 #
-# -- ORIGINAL-CODE STARTS-HERE ------------------------------------------------
+# pylint: disable=line-too-long, invalid-name, too-many-locals, too-many-arguments
+# pylint: disable=redefined-builtin, too-few-public-methods, no-else-return
+# pylint: disable=unused-variable, no-self-use, missing-docstring
+# pylint: disable=unused-argument, unused-variable
+# pylint: disable=too-many-branches, too-many-statements
+# pylint: disable=all
+#
+#  -- ORIGINAL-CODE STARTS-HERE ------------------------------------------------
 r'''Parse strings using a specification based on the Python format() syntax.
 
    ``parse()`` is the opposite of ``format()``
@@ -353,6 +360,8 @@ A more complete example of a custom type might be:
 This code is copyright 2012-2017 Richard Jones <richard@python.org>
 See the end of the source file for the license of use.
 '''
+
+from __future__ import absolute_import
 __version__ = '1.8.2'
 
 # yes, I now have two problems
