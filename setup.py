@@ -87,7 +87,7 @@ setup(
     name = "parse_type",
     version = "0.4.0",
     author = "Jens Engel",
-    author_email = "jens_engel@nowhere.xxx",
+    author_email = "jenisys@noreply.github.com",
     url = "https://github.com/jenisys/parse_type",
     download_url= "http://pypi.python.org/pypi/parse_type",
     description = "Simplifies to build parse types based on the parse module",

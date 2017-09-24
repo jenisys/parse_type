@@ -31,6 +31,7 @@ from invoke import Collection
 # -- TASK-LIBRARY:
 from . import clean
 from . import test
+from . import release
 # DISABLED: from . import docs
 
 # -----------------------------------------------------------------------------
@@ -46,7 +47,13 @@ namespace = Collection()
 namespace.add_task(clean.clean)
 namespace.add_task(clean.clean_all)
 namespace.add_collection(Collection.from_module(test))
+namespace.add_collection(Collection.from_module(release))
 # -- DISABLED: namespace.add_collection(Collection.from_module(docs))
+namespace.configure({
+    "tasks": {
+        "auto_dash_names": False
+    }
+})
 
 # -- INJECT: clean configuration into this namespace
 namespace.configure(clean.namespace.configuration())
