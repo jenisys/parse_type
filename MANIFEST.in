@@ -7,8 +7,10 @@ include *.rst
 include *.txt
 include *.ini
 include *.cfg
+include *.yaml
+include bin/invoke*
 
-recursive-include bin           *.sh *.py
+recursive-include bin           *.sh *.py *.cmd
 recursive-include py.requirements  *.txt
 recursive-include tasks         *.py *.txt *.rst *.zip
 recursive-include tests         *.py

@@ -30,8 +30,7 @@ from setuptools import setup, find_packages
 HERE = os.path.dirname(__file__)
 python_version = float('%s.%s' % sys.version_info[:2])
 
-requirements = ["parse>= 1.6", "six"]
-# requirements = ["parse", "six"]
+requirements = ["parse>= 1.8", "six"]
 if  python_version < 3.4:
     # -- NEED: Python3.4 enum types or enum34 backport
     requirements.append("enum34")
@@ -42,7 +41,7 @@ extra = dict(
     # -- REQUIREMENTS:
     # setup_requires = ["setuptools>=1.0"],
     # setup_requires=["pytest-runner"],
-    python_requires=">=2.6, >=3.2",
+    python_requires=">=2.6, !=3.0.*, !=3.1.*",
     install_requires = requirements,
     tests_require=["pytest >= 3.0"],
     extras_require = {
@@ -79,13 +78,27 @@ USE_PYTEST_RUNNER = os.environ.get("PYSETUP_TEST", "no") == "pytest"
 if USE_PYTEST_RUNNER:
     extra["tests_require"].extend(["pytest", "pytest-runner"])
 
+# -----------------------------------------------------------------------------
+# UTILITY:
+# -----------------------------------------------------------------------------
+def find_packages_by_root_package(where):
+    """
+    Better than excluding everything that is not needed,
+    collect only what is needed.
+    """
+    root_package = os.path.basename(where)
+    packages = [ "%s.%s" % (root_package, sub_package)
+                 for sub_package in find_packages(where)]
+    packages.insert(0, root_package)
+    return packages
+
 
 # -----------------------------------------------------------------------------
 # SETUP:
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = "0.4.0",
+    version = "0.4.1",
     author = "Jens Engel",
     author_email = "jenisys@noreply.github.com",
     url = "https://github.com/jenisys/parse_type",
@@ -94,10 +107,7 @@ setup(
     long_description = long_description,
     keywords= "parse, parsing",
     license = "BSD",
-    # provides = ["parse_type"],
-    # requires = requirements,
-
-    packages = find_packages(exclude=["tests", "tests.*"]),
+    packages = find_packages_by_root_package("parse_type"),
     include_package_data = True,
 
     classifiers = [
