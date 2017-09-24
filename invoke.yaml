@@ -8,7 +8,14 @@
 #   shell: C:\Windows\System32\cmd.exe
 # =====================================================
 
+project:
+    name: parse_type
+
+tasks:
+     auto_dash_names: false
+
 run:
     echo: true
     pty:  true
+
 

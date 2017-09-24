@@ -42,6 +42,7 @@ extra = dict(
     # -- REQUIREMENTS:
     # setup_requires = ["setuptools>=1.0"],
     # setup_requires=["pytest-runner"],
+    python_requires=">=2.6, >=3.2",
     install_requires = requirements,
     tests_require=["pytest >= 3.0"],
     extras_require = {
@@ -84,7 +85,7 @@ if USE_PYTEST_RUNNER:
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = "0.4.0.dev0",
+    version = "0.4.0",
     author = "Jens Engel",
     author_email = "jens_engel@nowhere.xxx",
     url = "https://github.com/jenisys/parse_type",
