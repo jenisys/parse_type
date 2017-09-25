@@ -30,11 +30,6 @@ from setuptools import setup, find_packages
 HERE = os.path.dirname(__file__)
 python_version = float('%s.%s' % sys.version_info[:2])
 
-requirements = ["parse>= 1.8", "six"]
-if  python_version < 3.4:
-    # -- NEED: Python3.4 enum types or enum34 backport
-    requirements.append("enum34")
-
 README = os.path.join(HERE, "README.rst")
 long_description = ''.join(open(README).readlines()[4:])
 extra = dict(
@@ -42,7 +37,11 @@ extra = dict(
     # setup_requires = ["setuptools>=1.0"],
     # setup_requires=["pytest-runner"],
     python_requires=">=2.6, !=3.0.*, !=3.1.*",
-    install_requires = requirements,
+    install_requires = [
+        "parse>= 1.8",
+        "enum34;python_version<'3.4'",
+        "six"
+    ],
     tests_require=["pytest >= 3.0"],
     extras_require = {
         'docs': ["sphinx>=1.2"],
