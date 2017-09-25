@@ -33,37 +33,11 @@ python_version = float('%s.%s' % sys.version_info[:2])
 README = os.path.join(HERE, "README.rst")
 long_description = ''.join(open(README).readlines()[4:])
 extra = dict(
-    # -- REQUIREMENTS:
-    # setup_requires = ["setuptools>=1.0"],
-    # setup_requires=["pytest-runner"],
-    python_requires=">=2.6, !=3.0.*, !=3.1.*",
-    install_requires = [
-        "parse>= 1.8",
-        "enum34;python_version<'3.4'",
-        "six"
+    tests_require=[
+        "pytest >= 3.0",
+        "unittest2; python_version < '2.7'",
     ],
-    tests_require=["pytest >= 3.0"],
-    extras_require = {
-        'docs': ["sphinx>=1.2"],
-        'develop': [
-            "coverage", "pytest", "pytest-cov",
-            "tox",
-        ],
-        # -- SUPPORT-WHEELS: Extra packages for Python2.6
-        # SEE: https://bitbucket.org/pypa/wheel/ , CHANGES.txt (v0.24.0)
-        ':python_version=="2.6"': ["enum34", "ordereddict", "unittest2"],
-        ':python_version=="2.7"': ["enum34"],
-        ':python_version=="3.2"': ["enum34"],
-        ':python_version=="3.3"': ["enum34"],
-    },
-
-    test_suite = "tests",
-    test_loader = "setuptools.command.test:ScanningLoader",
-    zip_safe = True,
 )
-
-if python_version < 2.7:
-    extra["tests_require"].append("unittest2")
 
 if python_version >= 3.0:
     extra["use_2to3"] = True
@@ -75,7 +49,7 @@ if python_version >= 3.0:
 # USE_PYTEST_RUNNER = os.environ.get("PYSETUP_TEST", "pytest") == "pytest"
 USE_PYTEST_RUNNER = os.environ.get("PYSETUP_TEST", "no") == "pytest"
 if USE_PYTEST_RUNNER:
-    extra["tests_require"].extend(["pytest", "pytest-runner"])
+    extra["tests_require"].append("pytest-runner")
 
 # -----------------------------------------------------------------------------
 # UTILITY:
@@ -108,6 +82,33 @@ setup(
     license = "BSD",
     packages = find_packages_by_root_package("parse_type"),
     include_package_data = True,
+    # -- REQUIREMENTS:
+    # setup_requires = ["setuptools>=1.0"],
+    # setup_requires=["pytest-runner"],
+    python_requires=">=2.6, !=3.0.*, !=3.1.*",
+    install_requires=[
+        "parse >= 1.8",
+        "enum34; python_version < '3.4'",
+        "six >= 1.11",
+        "ordereddict; python_version < '2.7'",
+    ],
+    extras_require={
+        'docs': ["sphinx>=1.2"],
+        'develop': [
+            "coverage", "pytest >= 3.0", "pytest-cov",
+            "tox",
+        ],
+        # -- SUPPORT-WHEELS: Extra packages for Python2.6
+        # SEE: https://bitbucket.org/pypa/wheel/ , CHANGES.txt (v0.24.0)
+        # ':python_version=="2.6"': ["enum34", "ordereddict", "unittest2"],
+        # ':python_version=="2.7"': ["enum34"],
+        # ':python_version=="3.2"': ["enum34"],
+        # ':python_version=="3.3"': ["enum34"],
+    },
+
+    test_suite = "tests",
+    test_loader = "setuptools.command.test:ScanningLoader",
+    zip_safe = True,
 
     classifiers = [
         "Development Status :: 4 - Beta",
@@ -127,6 +128,6 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: BSD License",
     ],
-    platforms  = [ 'any' ],
+    platforms = ['any'],
     **extra
 )
