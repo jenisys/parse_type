@@ -134,7 +134,8 @@ class TypeBuilder(object):
                 return None
             return converter(text)
         convert_optional.pattern = optional_pattern
-        convert_optional.group_count = group_count
+        # OLD: convert_optional.group_count = group_count
+        convert_optional.regex_group_count = group_count
         return convert_optional
 
     @classmethod
@@ -160,7 +161,8 @@ class TypeBuilder(object):
                 return []
             return [converter(part.strip()) for part in text.split(listsep)]
         convert_list0.pattern = many0_pattern
-        convert_list0.group_count = group_count
+        # OLD convert_list0.group_count = group_count
+        convert_list0.regex_group_count = group_count
         return convert_list0
 
     @classmethod
@@ -182,7 +184,8 @@ class TypeBuilder(object):
         def convert_list(text, m=None):
             return [converter(part.strip()) for part in text.split(listsep)]
         convert_list.pattern = many_pattern
-        convert_list.group_count = group_count
+        # OLD: convert_list.group_count = group_count
+        convert_list.regex_group_count = group_count
         return convert_list
 
     # -- ALIAS METHODS:

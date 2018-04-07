@@ -1,12 +1,7 @@
 # -*- coding: UTF-8 -*-
 # BASED-ON: https://github.com/r1chardj0n3s/parse/parse.py
-# VERSION:  parse 1.8.2
-# Same as original parse module except the following extensions.
-# EXTENSIONS:
-#  * group_count attribute support for user-defined type converters
-#     => FIXES: group_index offset problem for fixed fields
-#        when pattern has groups
-#  * raise StopIteration() instead of StopIteration (as class)
+# VERSION:  parse 1.8.3
+# Same as original parse modules.
 #
 # pylint: disable=line-too-long, invalid-name, too-many-locals, too-many-arguments
 # pylint: disable=redefined-builtin, too-few-public-methods, no-else-return
@@ -108,6 +103,9 @@ spam
 {'name': 'to seek the holy grail!'}
 >>> print(r['quest']['name'])
 to seek the holy grail!
+
+If the text you're matching has braces in it you can match those by including
+a double-brace ``{{`` or ``}}`` in your format string, just like format() does.
 
 
 Format Specification
@@ -305,11 +303,41 @@ A more complete example of a custom type might be:
 ...     return yesno_mapping[text.lower()]
 
 
+If the type converter ``pattern`` uses regex-grouping (with parenthesis),
+you should indicate this by using the optional ``regex_group_count`` parameter
+in the ``with_pattern()`` decorator:
+
+>>> @with_pattern(r'((\d+))', regex_group_count=2)
+... def parse_number2(text):
+...    return int(text)
+>>> parse('Answer: {:Number2} {:Number2}', 'Answer: 42 43', dict(Number2=parse_number2))
+<Result (42, 43) {}>
+
+Otherwise, this may cause parsing problems with unnamed/fixed parameters.
+
+
+Potential Gotchas
+-----------------
+
+`parse()` will always match the shortest text necessary (from left to right)
+to fulfil the parse pattern, so for example:
+
+>>> pattern = '{dir1}/{dir2}'
+>>> data = 'root/parent/subdir'
+>>> sorted(parse(pattern, data).named.items())
+[('dir1', 'root'), ('dir2', 'parent/subdir')]
+
+So, even though `{'dir1': 'root/parent', 'dir2': 'subdir'}` would also fit
+the pattern, the actual match represents the shortest successful match for
+`dir1`.
+
 ----
 
 **Version history (in brief)**:
 
-- 1.8.2 clarify message on invalid format specs (thanks Rick Teachey)
+- 1.8.3 Add regex_group_count to with_pattern() decorator to support
+  user-defined types that contain brackets/parenthesis (thanks Jens Engel)
+- 1.8.2 add documentation for including braces in format string
 - 1.8.1 ensure bare hexadecimal digits are not matched
 - 1.8.0 support manual control over result evaluation (thanks Timo Furrer)
 - 1.7.0 parse dict fields (thanks Mark Visser) and adapted to allow
@@ -376,7 +404,7 @@ __all__ = 'parse search findall with_pattern'.split()
 log = logging.getLogger(__name__)
 
 
-def with_pattern(pattern):
+def with_pattern(pattern, regex_group_count=None):
     """Attach a regular expression pattern matcher to a custom type converter
     function.
 
@@ -395,10 +423,12 @@ def with_pattern(pattern):
         >>> parse_number.pattern = r"\d+"
 
     :param pattern: regular expression pattern (as text)
+    :param regex_group_count: Indicates how many regex-groups are in pattern.
     :return: wrapped function
     """
     def decorator(func):
         func.pattern = pattern
+        func.regex_group_count = regex_group_count
         return func
     return decorator
 
@@ -899,10 +929,10 @@ class Parser(object):
         if type in self._extra_types:
             type_converter = self._extra_types[type]
             s = getattr(type_converter, 'pattern', r'.+?')
-            # -- EXTENSION: group_count attribute
-            group_count = getattr(type_converter, 'group_count', 0)
-            self._group_index += group_count
-            # -- EXTENSION-END
+            regex_group_count = getattr(type_converter, 'regex_group_count', 0)
+            if regex_group_count is None:
+                regex_group_count = 0
+            self._group_index += regex_group_count
 
             def f(string, m):
                 return type_converter(string)

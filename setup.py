@@ -71,7 +71,7 @@ def find_packages_by_root_package(where):
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = "0.4.2",
+    version = "0.4.3",
     author = "Jens Engel",
     author_email = "jenisys@noreply.github.com",
     url = "https://github.com/jenisys/parse_type",
@@ -82,9 +82,8 @@ setup(
     license = "BSD",
     packages = find_packages_by_root_package("parse_type"),
     include_package_data = True,
+
     # -- REQUIREMENTS:
-    # setup_requires = ["setuptools>=1.0"],
-    # setup_requires=["pytest-runner"],
     python_requires=">=2.6, !=3.0.*, !=3.1.*",
     install_requires=[
         "parse >= 1.8",
@@ -98,12 +97,6 @@ setup(
             "coverage", "pytest >= 3.0", "pytest-cov",
             "tox",
         ],
-        # -- SUPPORT-WHEELS: Extra packages for Python2.6
-        # SEE: https://bitbucket.org/pypa/wheel/ , CHANGES.txt (v0.24.0)
-        # ':python_version=="2.6"': ["enum34", "ordereddict", "unittest2"],
-        # ':python_version=="2.7"': ["enum34"],
-        # ':python_version=="3.2"': ["enum34"],
-        # ':python_version=="3.3"': ["enum34"],
     },
 
     test_suite = "tests",

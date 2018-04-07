@@ -222,7 +222,8 @@ class TypeBuilder(CardinalityTypeBuilder):
             convert_variant = cls.__create_convert_variant(re_opts, strict)
         convert_variant.pattern = pattern
         convert_variant.converters = tuple(converters)
-        convert_variant.group_count = group_count
+        # OLD: convert_variant.group_count = group_count
+        convert_variant.regex_group_count = group_count
         return convert_variant
 
     @staticmethod
