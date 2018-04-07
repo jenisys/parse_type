@@ -16,6 +16,7 @@ pip-log.txt
 .cache/
 .eggs/
 .idea/
+.pytest_cache/
 .tox/
 .venv*/
 .coverage
