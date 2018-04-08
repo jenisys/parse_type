@@ -307,6 +307,7 @@ If the type converter ``pattern`` uses regex-grouping (with parenthesis),
 you should indicate this by using the optional ``regex_group_count`` parameter
 in the ``with_pattern()`` decorator:
 
+>>> from parse_type.parse import parse, with_pattern  #< NEEDED-HERE FOR: doctest.
 >>> @with_pattern(r'((\d+))', regex_group_count=2)
 ... def parse_number2(text):
 ...    return int(text)
