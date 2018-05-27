@@ -71,7 +71,7 @@ def find_packages_by_root_package(where):
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = "0.5.0",
+    version = "0.5.1",
     author = "Jens Engel",
     author_email = "jenisys@noreply.github.com",
     url = "https://github.com/jenisys/parse_type",
@@ -86,8 +86,7 @@ setup(
     # -- REQUIREMENTS:
     python_requires=">=2.6, !=3.0.*, !=3.1.*",
     install_requires=[
-        "parse >= 1.8.2",
-        # -- BETTER but unreleased: "parse >= 1.8.3",
+        "parse >= 1.8.4",
         "enum34; python_version < '3.4'",
         "six >= 1.11",
         "ordereddict; python_version < '2.7'",
@@ -116,6 +115,7 @@ setup(
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Code Generators",

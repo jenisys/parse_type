@@ -32,20 +32,25 @@ class Parser(parse.Parser):
     # -- TYPE-BUILDER: For missing types in Fields with CardinalityField part.
     type_builder = CardinalityFieldTypeBuilder
 
-    def __init__(self, schema, extra_types={}, type_builder=None):
+    def __init__(self, schema, extra_types=None, case_sensitive=False,
+                 type_builder=None):
         """Creates a parser with CardinalityField part support.
 
         :param schema:  Parse schema (or format) for parser (as string).
-        :param extra_types:  Type dictionary with type converters.
+        :param extra_types:  Type dictionary with type converters (or None).
+        :param case_sensitive: Indicates if case-sensitive regexp are used.
         :param type_builder: Type builder to use for missing types.
         """
+        if extra_types is None:
+            extra_types = {}
         missing = self.create_missing_types(schema, extra_types, type_builder)
         if missing:
             log.debug("MISSING TYPES: %s" % ",".join(missing.keys()))
             extra_types.update(missing)
 
         # -- FINALLY: Delegate to base class.
-        super(Parser, self).__init__(schema, extra_types)
+        super(Parser, self).__init__(schema, extra_types,
+                                     case_sensitive=case_sensitive)
 
     @classmethod
     def create_missing_types(cls, schema, type_dict, type_builder=None):

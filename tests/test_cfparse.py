@@ -92,7 +92,7 @@ class TestParser(ParseTypeTestCase):
 
         # -- ENSURE: Missing type variant is created.
         schema = "List: {numbers:Number+}"
-        parser = Parser(schema, existing_types, type_builder)
+        parser = Parser(schema, existing_types, type_builder=type_builder)
         self.assertTrue("Number+" in existing_types)
 
         # -- ENSURE: Newly created type variant is usable.
