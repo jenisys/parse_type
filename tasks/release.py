@@ -6,7 +6,7 @@ Normal steps::
 
 
     python setup.py sdist bdist_wheel
-    
+
     twine register dist/{project}-{version}.tar.gz
     twine upload   dist/*
 
@@ -30,12 +30,12 @@ Configuration file for pypi repositories:
     index-servers =
         pypi
         testpypi
-    
+
     [pypi]
     # repository = https://pypi.python.org/pypi
     username = __USERNAME_HERE__
     password:
-    
+
     [testpypi]
     # repository = https://test.pypi.org/legacy
     username = __USERNAME_HERE__
@@ -50,7 +50,7 @@ Configuration file for pypi repositories:
 
 from __future__ import absolute_import
 from invoke import Collection, task
-from .clean import path_glob
+from ._tasklet_cleanup import path_glob
 from ._dry_run import DryRunContext
 
 
@@ -61,7 +61,7 @@ from ._dry_run import DryRunContext
 def checklist(ctx):
     """Checklist for releasing this project."""
     checklist = """PRE-RELEASE CHECKLIST:
-[ ]  Everything is checked in    
+[ ]  Everything is checked in
 [ ]  All tests pass w/ tox
 
 RELEASE CHECKLIST:
