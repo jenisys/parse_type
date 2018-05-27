@@ -11,7 +11,7 @@ import os.path
 import sys
 
 # -- TASK-LIBRARY:
-from .clean import cleanup_tasks, cleanup_dirs
+from ._tasklet_cleanup import cleanup_tasks, cleanup_dirs
 
 # -----------------------------------------------------------------------------
 # TASKS:
