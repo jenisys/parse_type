@@ -930,7 +930,9 @@ class TestParseType(unittest.TestCase):
 
     def test_decimal_value(self):
         value = Decimal('5.5')
-        str_ = 'test {}'.format(value)
+        # ORIGINAL: str_ = 'test {}'.format(value)
+        # HINT: string-format w/ empty braces only for Python2.7 or newer
+        str_ = 'test {0}'.format(value)
         parser = parse.Parser('test {:F}')
         self.assertEqual(parser.parse(str_)[0], value)
 
