@@ -1,6 +1,6 @@
 # -*- encoding: utf8 -*-
 # -- BASED-ON: https://github.com/r1chardj0n3s/parse/test_parse.py
-# VERSION:  parse 1.8.3
+# VERSION:  parse 1.8.4
 # Same as original file but uses bundled :mod:`parse_type.parse` module
 # instead of :mod:`parse` module
 #
@@ -20,6 +20,7 @@ except ImportError:
     import unittest
 # -- ADAPTATION-END
 from datetime import datetime, time
+from decimal import Decimal
 import re
 
 # -- EXTENSION:
@@ -415,6 +416,11 @@ class TestParse(unittest.TestCase):
         y('a {:x=5d} b', 'a xxx12 b', 12)
         y('a {:x=5d} b', 'a -xxx12 b', -12)
 
+    def test_hex_looks_like_binary_issue65(self):
+        r = parse.parse('a {:x} b', 'a 0B b')
+        self.assertEqual(r[0], 11)
+        r = parse.parse('a {:x} b', 'a 0B1 b')
+        self.assertEqual(r[0], 1)
 
     def test_two_datetimes(self):
         r = parse.parse('a {:ti} {:ti} b', 'a 1997-07-16 2012-08-01 b')
@@ -741,7 +747,13 @@ class TestBugs(unittest.TestCase):
 
     def test_pm_overflow_issue16(self):
         r = parse.parse('Meet at {:tg}', 'Meet at 1/2/2011 12:45 PM')
-        self.assertEqual(r[0], datetime(2011, 2, 2, 0, 45))
+        self.assertEqual(r[0], datetime(2011, 2, 1, 12, 45))
+
+    def test_pm_handling_issue57(self):
+        r = parse.parse('Meet at {:tg}', 'Meet at 1/2/2011 12:15 PM')
+        self.assertEqual(r[0], datetime(2011, 2, 1, 12, 15))
+        r = parse.parse('Meet at {:tg}', 'Meet at 1/2/2011 12:15 AM')
+        self.assertEqual(r[0], datetime(2011, 2, 1, 0, 15))
 
     def test_user_type_with_group_count_issue60(self):
         @parse.with_pattern(r'((\w+))', regex_group_count=2)
@@ -910,6 +922,17 @@ class TestParseType(unittest.TestCase):
         self.assert_match(parser2, 'test a', 'value', 1)
         self.assert_match(parser2, 'test b', 'value', 2)
         self.assert_mismatch(parser2, 'test c', 'value')
+
+    def test_case_sensitivity(self):
+        r = parse.parse('SPAM {} SPAM', 'spam spam spam')
+        self.assertEqual(r[0], 'spam')
+        self.assertEqual(parse.parse('SPAM {} SPAM', 'spam spam spam', case_sensitive=True), None)
+
+    def test_decimal_value(self):
+        value = Decimal('5.5')
+        str_ = 'test {}'.format(value)
+        parser = parse.Parser('test {:F}')
+        self.assertEqual(parser.parse(str_)[0], value)
 
 
 if __name__ == '__main__':
