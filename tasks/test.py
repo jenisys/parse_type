@@ -4,9 +4,9 @@ Invoke test tasks.
 """
 
 from __future__ import print_function
-from invoke import task, Collection
 import os.path
 import sys
+from invoke import task, Collection
 
 # -- TASK-LIBRARY:
 from ._tasklet_cleanup import cleanup_tasks, cleanup_dirs, cleanup_files
@@ -67,17 +67,17 @@ def pytest(ctx, args="", options=""):
 })
 def behave(ctx, args="", format="", options=""):
     """Run behave tests."""
-    format  = format or ctx.behave_test.format
+    format = format or ctx.behave_test.format
     options = options or ctx.behave_test.options
     args = args or ctx.behave_test.args
     if os.path.exists("bin/behave"):
-        behave = "{python} bin/behave".format(python=sys.executable)
+        behave_cmd = "{python} bin/behave".format(python=sys.executable)
     else:
-        behave = "{python} -m behave".format(python=sys.executable)
+        behave_cmd = "{python} -m behave".format(python=sys.executable)
 
     for group_args in grouped_by_prefix(args, ctx.behave_test.scopes):
         ctx.run("{behave} -f {format} {options} {args}".format(
-            behave=behave, format=format, options=options, args=group_args))
+            behave=behave_cmd, format=format, options=options, args=group_args))
 
 
 @task(help={
@@ -108,8 +108,8 @@ def coverage(ctx, args="", report="report", append=False):
     # -- RUN TESTS WITH COVERAGE:
     if pytest_should_run:
         ctx.run("coverage run {options} -m pytest {args}".format(
-                args=pytest_args, options=" ".join(opts)))
-    if behave_should_run and USE_BEHAVE:
+            args=pytest_args, options=" ".join(opts)))
+    if behave_should_run:
         behave_options = ctx.behave_test.coverage_options or ""
         os.environ["COVERAGE_PROCESS_START"] = os.path.abspath(".coveragerc")
         behave(ctx, args=behave_args, options=behave_options)
@@ -130,6 +130,7 @@ def select_prefix_for(arg, prefixes):
             return prefix
     return os.path.dirname(arg)
 
+
 def select_by_prefix(args, prefixes):
     selected = []
     for arg in args.strip().split():
@@ -138,6 +139,7 @@ def select_by_prefix(args, prefixes):
         if scope:
             selected.append(arg)
     return " ".join(selected)
+
 
 def grouped_by_prefix(args, prefixes):
     """Group behave args by (directory) scope into multiple test-runs."""

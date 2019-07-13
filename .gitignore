@@ -22,6 +22,7 @@ Pipfile.lock
 .pytest_cache/
 .tox/
 .venv*/
+.vscode/
 .coverage
 
 .project

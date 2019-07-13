@@ -1,5 +1,5 @@
 # =====================================================
-# INVOKE CONFIGURATION:
+# INVOKE CONFIGURATION: parse_type
 # =====================================================
 # -- ON WINDOWS:
 # run:
@@ -16,9 +16,12 @@ tasks:
 
 run:
     echo: true
-    pty:  true
+    # DISABLED: pty:  true
 
-clean_all:
+cleanup_all:
     extra_directories:
-        - .pytest_cache
+      - build
+      - dist
+      - .hypothesis
+      - .pytest_cache
 
