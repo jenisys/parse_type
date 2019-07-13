@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
+# pylint: disable=missing-docstring
+r"""
 Provides support to compose user-defined parse types.
 
 Cardinality
@@ -61,12 +62,11 @@ A Choice data type allows to select one of several strings.
 """
 
 from __future__ import absolute_import
-from .cardinality import \
-    Cardinality, TypeBuilder as CardinalityTypeBuilder
-from parse_type.cardinality import pattern_group_count
-import enum
 import inspect
 import re
+import enum
+from parse_type.cardinality import pattern_group_count, \
+    Cardinality, TypeBuilder as CardinalityTypeBuilder
 
 __all__ = ["TypeBuilder", "build_type_dict", "parse_anything"]
 
@@ -76,7 +76,7 @@ class TypeBuilder(CardinalityTypeBuilder):
     Provides a utility class to build type-converters (parse_types) for
     the :mod:`parse` module.
     """
-    default_strict  = True
+    default_strict = True
     default_re_opts = (re.IGNORECASE | re.DOTALL)
 
     @classmethod
@@ -92,7 +92,8 @@ class TypeBuilder(CardinalityTypeBuilder):
         if not item_converter:
             item_converter = parse_anything
         return cls.with_cardinality(Cardinality.many, item_converter,
-                                pattern=cls.anything_pattern, listsep=listsep)
+                                    pattern=cls.anything_pattern,
+                                    listsep=listsep)
 
     @staticmethod
     def make_enum(enum_mappings):
@@ -103,7 +104,7 @@ class TypeBuilder(CardinalityTypeBuilder):
         :return: Type converter function object for the enum/mapping.
         """
         if (inspect.isclass(enum_mappings) and
-            issubclass(enum_mappings, enum.Enum)):
+                issubclass(enum_mappings, enum.Enum)):
             enum_class = enum_mappings
             enum_mappings = enum_class.__members__
 
@@ -145,7 +146,7 @@ class TypeBuilder(CardinalityTypeBuilder):
         def convert_choice(text):
             if transform:
                 text = transform(text)
-            if strict and not (text in convert_choice.choices):
+            if strict and text not in convert_choice.choices:
                 values = ", ".join(convert_choice.choices)
                 raise ValueError("%s not in: %s" % (text, values))
             return text
@@ -170,7 +171,7 @@ class TypeBuilder(CardinalityTypeBuilder):
         def convert_choice2(text):
             if transform:
                 text = transform(text)
-            if strict and not (text in convert_choice2.choices):
+            if strict and text not in convert_choice2.choices:
                 values = ", ".join(convert_choice2.choices)
                 raise ValueError("%s not in: %s" % (text, values))
             index = convert_choice2.choices.index(text)
@@ -217,12 +218,12 @@ class TypeBuilder(CardinalityTypeBuilder):
 
         if compiled:
             convert_variant = cls.__create_convert_variant_compiled(converters,
-                                                                re_opts, strict)
+                                                                    re_opts,
+                                                                    strict)
         else:
             convert_variant = cls.__create_convert_variant(re_opts, strict)
         convert_variant.pattern = pattern
         convert_variant.converters = tuple(converters)
-        # OLD: convert_variant.group_count = group_count
         convert_variant.regex_group_count = group_count
         return convert_variant
 

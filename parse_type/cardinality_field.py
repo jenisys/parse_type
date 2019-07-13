@@ -9,10 +9,11 @@ A cardinality field is a type suffix for parse format expression, ala:
 """
 
 from __future__ import absolute_import
-from .cardinality import Cardinality, TypeBuilder
 import six
+from parse_type.cardinality import Cardinality, TypeBuilder
 
-class MissingTypeError(KeyError):
+
+class MissingTypeError(KeyError):   # pylint: disable=missing-docstring
     pass
 
 # -----------------------------------------------------------------------------
@@ -91,8 +92,7 @@ class CardinalityFieldTypeBuilder(object):
 
     @classmethod
     def create_type_variant(cls, type_name, type_converter):
-        """
-        Create type variants for types with a cardinality field.
+        r"""Create type variants for types with a cardinality field.
         The new type converters are based on the type converter with
         cardinality=1.
 
@@ -129,15 +129,15 @@ class CardinalityFieldTypeBuilder(object):
 
         assert callable(type_converter)
         type_variant = TypeBuilder.with_cardinality(cardinality,
-                                    type_converter, listsep=cls.listsep)
+                                                    type_converter,
+                                                    listsep=cls.listsep)
         type_variant.name = type_name
         return type_variant
 
 
     @classmethod
     def create_type_variants(cls, type_names, type_dict):
-        """
-        Create type variants for types with a cardinality field.
+        """Create type variants for types with a cardinality field.
         The new type converters are based on the type converter with
         cardinality=1.
 
@@ -157,16 +157,15 @@ class CardinalityFieldTypeBuilder(object):
             type_variant_dict[type_name] = type_variant
         return type_variant_dict
 
-    # XXX-JE-TODO: Check if really needed.
+    # MAYBE: Check if really needed.
     @classmethod
     def create_missing_type_variants(cls, type_names, type_dict):
-        """
-        Create missing type variants for types with a cardinality field.
+        """Create missing type variants for types with a cardinality field.
 
         :param type_names: List of type names with cardinality field suffix.
         :param type_dict:  Type dictionary with named type converters.
         :return: Type dictionary with missing type converter variants.
         """
-        missing_type_names = [ name for name in type_names
-                               if name not in type_dict ]
+        missing_type_names = [name for name in type_names
+                              if name not in type_dict]
         return cls.create_type_variants(missing_type_names, type_dict)

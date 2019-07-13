@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name, missing-docstring, too-few-public-methods
 """
 Integrated into :mod:`parse` module.
 """
 
 from __future__ import absolute_import
-from .parse_type_test import ParseTypeTestCase
-from parse_type import build_type_dict
-import parse
 import unittest
+import parse
+from parse_type import build_type_dict
+from .parse_type_test import ParseTypeTestCase
 
 
 # -----------------------------------------------------------------------------
 # TEST CASE: TestParseTypeWithPatternDecorator
 # -----------------------------------------------------------------------------
 class TestParseTypeWithPatternDecorator(ParseTypeTestCase):
-    """
+    r"""
     Test the pattern decorator for type-converter (parse_type) functions.
 
         >>> def parse_number(text):
@@ -80,11 +81,12 @@ class TestParseTypeWithPatternDecorator(ParseTypeTestCase):
             return int(text)
 
         parse_number.name = "Number" #< For test automation.
-        more_types = build_type_dict([ parse_number ])
+        more_types = build_type_dict([parse_number])
         schema = "Test: {number:Number}"
         parser = parse.Parser(schema, more_types)
 
         # -- PERFORM TESTS:
+        # pylint: disable=bad-whitespace
         self.assert_match(parser, "Test: 1",   "number", 1)
         self.assert_match(parser, "Test: 42",  "number", 42)
         self.assert_match(parser, "Test: 123", "number", 123)
@@ -102,11 +104,12 @@ class TestParseTypeWithPatternDecorator(ParseTypeTestCase):
             def parse_person(cls, text):
                 return text
 
-        more_types = { "Person": C.parse_person }
+        more_types = {"Person": C.parse_person}
         schema = "Test: {person:Person}"
         parser = parse.Parser(schema, more_types)
 
         # -- PERFORM TESTS:
+        # pylint: disable=bad-whitespace
         self.assert_match(parser, "Test: Alice", "person", "Alice")
         self.assert_match(parser, "Test: Bob",   "person", "Bob")
 
