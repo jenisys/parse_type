@@ -22,13 +22,13 @@ parse_type
 `parse_type`_ extends the `parse`_ module (opposite of `string.format()`_)
 with the following features:
 
-    * build type converters for common use cases (enum/mapping, choice)
-    * build a type converter with a cardinality constraint (0..1, 0..*, 1..*)
-      from the type converter with cardinality=1.
-    * compose a type converter from other type converters
-    * an extended parser that supports the CardinalityField naming schema
-      and creates missing type variants (0..1, 0..*, 1..*) from the
-      primary type converter
+* build type converters for common use cases (enum/mapping, choice)
+* build a type converter with a cardinality constraint (0..1, 0..*, 1..*)
+    from the type converter with cardinality=1.
+* compose a type converter from other type converters
+* an extended parser that supports the CardinalityField naming schema
+    and creates missing type variants (0..1, 0..*, 1..*) from the
+    primary type converter
 
 .. _parse_type: http://pypi.python.org/pypi/parse_type
 .. _parse:      http://pypi.python.org/pypi/parse
@@ -213,8 +213,8 @@ type converter alternatives. This is normally called a "variant" (or: union).
 
 Create an type converter for an "Variant" type that accepts:
 
-  * Numbers (positive numbers, as integer)
-  * Color enum values (by name)
+* Numbers (positive numbers, as integer)
+* Color enum values (by name)
 
 .. code-block:: python
 
