@@ -5,13 +5,13 @@ cardinality fields in (user-defined) types.
 """
 
 from __future__ import absolute_import
+import logging
+import parse
 from .cardinality_field import CardinalityField, CardinalityFieldTypeBuilder
 from .parse_util import FieldParser
-import parse
-import logging
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger(__name__)   # pylint: disable=invalid-name
 
 
 class Parser(parse.Parser):
@@ -45,6 +45,7 @@ class Parser(parse.Parser):
             extra_types = {}
         missing = self.create_missing_types(schema, extra_types, type_builder)
         if missing:
+            # pylint: disable=logging-not-lazy
             log.debug("MISSING TYPES: %s" % ",".join(missing.keys()))
             extra_types.update(missing)
 
@@ -73,6 +74,7 @@ class Parser(parse.Parser):
 
     @staticmethod
     def extract_missing_special_type_names(schema, type_dict):
+        # pylint: disable=invalid-name
         """Extract the type names for fields with CardinalityField part.
         Selects only the missing type names that are not in the type dictionary.
 
@@ -82,4 +84,4 @@ class Parser(parse.Parser):
         """
         for name in FieldParser.extract_types(schema):
             if CardinalityField.matches_type(name) and (name not in type_dict):
-                    yield name
+                yield name

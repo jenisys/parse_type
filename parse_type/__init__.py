@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+This module extends the :mod:`parse` to build and derive additional
+parse-types from other, existing types.
+"""
 
 from __future__ import absolute_import
 from parse_type.cardinality import Cardinality
@@ -8,7 +12,7 @@ __all__ = ["Cardinality", "TypeBuilder", "build_type_dict"]
 __version__ = "0.5.1"
 
 # -----------------------------------------------------------------------------
-# Copyright (c) 2012-2017 by Jens Engel (https://github/jenisys/)
+# Copyright (c) 2012-2019 by Jens Engel (https://github/jenisys/)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal

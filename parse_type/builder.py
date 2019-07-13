@@ -231,6 +231,7 @@ class TypeBuilder(CardinalityTypeBuilder):
     def __create_convert_variant(re_opts, strict):
         # -- USE: Regular expression pattern (compiled on use).
         def convert_variant(text, m=None):
+            # pylint: disable=invalid-name, unused-argument, missing-docstring
             for converter in convert_variant.converters:
                 if re.match(converter.pattern, text, re_opts):
                     return converter(text)
@@ -248,6 +249,7 @@ class TypeBuilder(CardinalityTypeBuilder):
                 converter.matcher = re.compile(converter.pattern, re_opts)
 
         def convert_variant(text, m=None):
+            # pylint: disable=invalid-name, unused-argument, missing-docstring
             for converter in convert_variant.converters:
                 if converter.matcher.match(text):
                     return converter(text)
@@ -283,6 +285,7 @@ def parse_anything(text, match=None, match_start=0):
     :param text:  Text to convert (as string).
     :return: Same text (as string).
     """
+    # pylint: disable=unused-argument
     return text
 parse_anything.pattern = TypeBuilder.anything_pattern
 

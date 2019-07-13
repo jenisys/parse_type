@@ -8,10 +8,12 @@ for a data type with the specified cardinality.
 from __future__ import absolute_import
 from enum import Enum
 
+
 # -----------------------------------------------------------------------------
 # FUNCTIONS:
 # -----------------------------------------------------------------------------
 def pattern_group_count(pattern):
+    """Count the pattern-groups within a regex-pattern (as text)."""
     return pattern.replace(r"\(", "").count("(")
 
 
@@ -22,6 +24,7 @@ class Cardinality(Enum):
     """Cardinality enumeration class to simplify building regular expression
     patterns for a data type with the specified cardinality.
     """
+    # pylint: disable=bad-whitespace
     __order__ = "one, zero_or_one, zero_or_more, one_or_more"
     one          = (None, 0)
     zero_or_one  = (r"(%s)?", 1)                 # SCHEMA: pattern
@@ -61,8 +64,8 @@ class Cardinality(Enum):
             return pattern
         elif self is Cardinality.zero_or_one:
             return self.schema % pattern
-        else:
-            return self.schema % (pattern, listsep, pattern)
+        # -- OTHERWISE:
+        return self.schema % (pattern, listsep, pattern)
 
     def compute_group_count(self, pattern):
         """Compute the number of regexp match groups when the pattern is provided
@@ -87,9 +90,7 @@ class TypeBuilder(object):
     based on the type-converter for cardinality one.
     """
     anything_pattern = r".+?"
-    default_pattern  = anything_pattern
-
-
+    default_pattern = anything_pattern
 
     @classmethod
     def with_cardinality(cls, cardinality, converter, pattern=None,
@@ -108,9 +109,8 @@ class TypeBuilder(object):
         builder_func = getattr(cls, "with_%s" % cardinality.name)
         if cardinality is Cardinality.zero_or_one:
             return builder_func(converter, pattern)
-        else:
-            # -- MANY CASE: 0..*, 1..*
-            return builder_func(converter, pattern, listsep=listsep)
+        # -- MANY CASE: 0..*, 1..*
+        return builder_func(converter, pattern, listsep=listsep)
 
     @classmethod
     def with_zero_or_one(cls, converter, pattern=None):
@@ -128,13 +128,13 @@ class TypeBuilder(object):
         group_count = cardinality.compute_group_count(pattern)
 
         def convert_optional(text, m=None):
+            # pylint: disable=invalid-name, unused-argument, missing-docstring
             if text:
                 text = text.strip()
             if not text:
                 return None
             return converter(text)
         convert_optional.pattern = optional_pattern
-        # OLD: convert_optional.group_count = group_count
         convert_optional.regex_group_count = group_count
         return convert_optional
 
@@ -150,11 +150,12 @@ class TypeBuilder(object):
         """
         cardinality = Cardinality.zero_or_more
         if not pattern:
-            pattern  = getattr(converter, "pattern", cls.default_pattern)
+            pattern = getattr(converter, "pattern", cls.default_pattern)
         many0_pattern = cardinality.make_pattern(pattern, listsep)
         group_count = cardinality.compute_group_count(pattern)
 
         def convert_list0(text, m=None):
+            # pylint: disable=invalid-name, unused-argument, missing-docstring
             if text:
                 text = text.strip()
             if not text:
@@ -182,6 +183,7 @@ class TypeBuilder(object):
         group_count = cardinality.compute_group_count(pattern)
 
         def convert_list(text, m=None):
+            # pylint: disable=invalid-name, unused-argument, missing-docstring
             return [converter(part.strip()) for part in text.split(listsep)]
         convert_list.pattern = many_pattern
         # OLD: convert_list.group_count = group_count
@@ -203,4 +205,3 @@ class TypeBuilder(object):
     def with_many0(cls, converter, pattern=None, listsep=','):
         """Alias for :py:meth:`with_zero_or_more()` method."""
         return cls.with_zero_or_more(converter, pattern, listsep)
-
