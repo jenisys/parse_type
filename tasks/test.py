@@ -109,7 +109,7 @@ def coverage(ctx, args="", report="report", append=False):
     if pytest_should_run:
         ctx.run("coverage run {options} -m pytest {args}".format(
             args=pytest_args, options=" ".join(opts)))
-    if behave_should_run:
+    if behave_should_run and USE_BEHAVE:
         behave_options = ctx.behave_test.coverage_options or ""
         os.environ["COVERAGE_PROCESS_START"] = os.path.abspath(".coveragerc")
         behave(ctx, args=behave_args, options=behave_options)

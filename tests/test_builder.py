@@ -3,18 +3,18 @@
 """
 Test suite  for parse_type.py
 
-REQUIRES: parse >= 1.5.3.1 ('pattern' attribute support)
+REQUIRES: parse >= 1.8.4 ('pattern' attribute support)
 """
 
 from __future__ import absolute_import
+import re
+import unittest
+import parse
 from .parse_type_test import ParseTypeTestCase
 from .parse_type_test \
     import parse_number, parse_yesno, parse_person_choice, parse_color, Color
 from parse_type import TypeBuilder, build_type_dict
 from enum import Enum
-import parse
-import re
-import unittest
 
 
 # -----------------------------------------------------------------------------
@@ -496,7 +496,6 @@ Person:   Alice
         self.assertEqual(result.fixed, tuple(expected))
 
     def test_parse_with_many_unnamed_fields_with_variants(self):
-        from parse_type.parse import Parser as Parser2
         type_dict = build_type_dict(self.TYPE_CONVERTERS)
         schema = """\
 Number:   {:Number}
@@ -507,7 +506,7 @@ Variant2: {:Color_or_PersonChoice}
 Variant1: {:Number_or_YesNo}
 """
         # -- OMIT: XFAIL, due to group_index delta counting => Parser problem.
-        parser = Parser2(schema, type_dict)
+        parser = parse.Parser(schema, type_dict)
 
         text = """\
 Number:   12

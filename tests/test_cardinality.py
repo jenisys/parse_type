@@ -7,7 +7,7 @@ Test suite to test the :mod:`parse_type.cardinality` module.
 from __future__ import absolute_import
 from .parse_type_test import ParseTypeTestCase, parse_number
 from parse_type import Cardinality, TypeBuilder, build_type_dict
-from parse_type.parse import Parser as ParserExt
+from parse import Parser
 import parse
 import unittest
 
@@ -387,13 +387,13 @@ class TestTypeBuilder4Cardinality(CardinalityTypeBuilderTest):
 
     def test_parse_with_optional_and_unnamed_fields(self):
         # -- ENSURE: Cardinality.optional.group_count is correct
-        # REQUIRES: ParserExt := parse_type.Parser with group_count support
+        # REQUIRES: Parser := parse_type.Parser with group_count support
         parse_opt_number = TypeBuilder.with_optional(parse_number)
         parse_opt_number.name = "Number?"
 
         type_dict = build_type_dict([parse_opt_number, parse_number])
         schema = "Numbers: {:Number?} {:Number}"
-        parser = ParserExt(schema, type_dict)
+        parser = Parser(schema, type_dict)
 
         # -- CASE: Optional number is present
         result = parser.parse("Numbers: 34 12")
@@ -409,13 +409,13 @@ class TestTypeBuilder4Cardinality(CardinalityTypeBuilderTest):
 
     def test_parse_with_many_and_unnamed_fields(self):
         # -- ENSURE: Cardinality.one_or_more.group_count is correct
-        # REQUIRES: ParserExt := parse_type.Parser with group_count support
+        # REQUIRES: Parser := parse_type.Parser with group_count support
         parse_many_numbers = TypeBuilder.with_many(parse_number)
         parse_many_numbers.name = "Number+"
 
         type_dict = build_type_dict([parse_many_numbers, parse_number])
         schema = "Numbers: {:Number+} {:Number}"
-        parser = ParserExt(schema, type_dict)
+        parser = Parser(schema, type_dict)
 
         # -- CASE:
         result = parser.parse("Numbers: 1, 2, 3 42")
@@ -430,13 +430,13 @@ class TestTypeBuilder4Cardinality(CardinalityTypeBuilderTest):
 
     def test_parse_with_many0_and_unnamed_fields(self):
         # -- ENSURE: Cardinality.zero_or_more.group_count is correct
-        # REQUIRES: ParserExt := parse_type.Parser with group_count support
+        # REQUIRES: Parser := parse_type.Parser with group_count support
         parse_many0_numbers = TypeBuilder.with_many0(parse_number)
         parse_many0_numbers.name = "Number*"
 
         type_dict = build_type_dict([parse_many0_numbers, parse_number])
         schema = "Numbers: {:Number*} {:Number}"
-        parser = ParserExt(schema, type_dict)
+        parser = Parser(schema, type_dict)
 
         # -- CASE: Optional numbers are present
         result = parser.parse("Numbers: 1, 2, 3 42")
