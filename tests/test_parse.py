@@ -1,6 +1,6 @@
 # -*- encoding: utf8 -*-
 # -- BASED-ON: https://github.com/r1chardj0n3s/parse/test_parse.py
-# VERSION:  parse 1.8.4
+# VERSION:  parse 1.12.0
 # Same as original file but uses bundled :mod:`parse_type.parse` module
 # instead of :mod:`parse` module
 #
@@ -41,40 +41,40 @@ class TestPattern(unittest.TestCase):
 
     def test_braces(self):
         # pull a simple string out of another string
-        self._test_expression('{{ }}', '\{ \}')
+        self._test_expression('{{ }}', r'\{ \}')
 
     def test_fixed(self):
         # pull a simple string out of another string
-        self._test_expression('{}', '(.+?)')
-        self._test_expression('{} {}', '(.+?) (.+?)')
+        self._test_expression('{}', r'(.+?)')
+        self._test_expression('{} {}', r'(.+?) (.+?)')
 
     def test_named(self):
         # pull a named string out of another string
-        self._test_expression('{name}', '(?P<name>.+?)')
+        self._test_expression('{name}', r'(?P<name>.+?)')
         self._test_expression('{name} {other}',
-            '(?P<name>.+?) (?P<other>.+?)')
+            r'(?P<name>.+?) (?P<other>.+?)')
 
     def test_named_typed(self):
         # pull a named string out of another string
-        self._test_expression('{name:w}', '(?P<name>\w+)')
+        self._test_expression('{name:w}', r'(?P<name>\w+)')
         self._test_expression('{name:w} {other:w}',
-            '(?P<name>\w+) (?P<other>\w+)')
+            r'(?P<name>\w+) (?P<other>\w+)')
 
     def test_beaker(self):
         # skip some trailing whitespace
-        self._test_expression('{:<}', '(.+?) *')
+        self._test_expression('{:<}', r'(.+?) *')
 
     def test_left_fill(self):
         # skip some trailing periods
-        self._test_expression('{:.<}', '(.+?)\.*')
+        self._test_expression('{:.<}', r'(.+?)\.*')
 
     def test_bird(self):
         # skip some trailing whitespace
-        self._test_expression('{:>}', ' *(.+?)')
+        self._test_expression('{:>}', r' *(.+?)')
 
     def test_center(self):
         # skip some surrounding whitespace
-        self._test_expression('{:^}', ' *(.+?) *')
+        self._test_expression('{:^}', r' *(.+?) *')
 
     def test_format_variety(self):
         def _(fmt, matches):
@@ -142,6 +142,12 @@ class TestResult(unittest.TestCase):
         self.assertEqual(r['spam'], 'ham')
         self.assertRaises(KeyError, r.__getitem__, 'ham')
         self.assertRaises(IndexError, r.__getitem__, 0)
+
+    def test_contains(self):
+        r = parse.Result(('cat',), {'spam': 'ham'}, None)
+        self.assertTrue('spam' in r)
+        self.assertTrue('cat' not in r)
+        self.assertTrue('ham' not in r)
 
 
 class TestParse(unittest.TestCase):
@@ -411,6 +417,7 @@ class TestParse(unittest.TestCase):
         y('a {:05d} b', 'a 00001 b', 1)
         y('a {:05d} b', 'a -00001 b', -1)
         y('a {:05d} b', 'a +00001 b', 1)
+        y('a {:02d} b', 'a 10 b', 10)
 
         y('a {:=d} b', 'a 000012 b', 12)
         y('a {:x=5d} b', 'a xxx12 b', 12)
@@ -684,6 +691,16 @@ class TestParse(unittest.TestCase):
             p = parse.compile('{:ti}' * 15)
             self.assertRaises(parse.TooManyFields, p.parse, '')
 
+    def test_letters(self):
+        res = parse.parse('{:l}', '')
+        self.assertIsNone(res)
+        res = parse.parse('{:l}', 'sPaM')
+        self.assertEqual(res.fixed, ('sPaM', ))
+        res = parse.parse('{:l}', 'sP4M')
+        self.assertIsNone(res)
+        res = parse.parse('{:l}', 'sP_M')
+        self.assertIsNone(res)
+
 
 class TestSearch(unittest.TestCase):
     def test_basic(self):
@@ -705,7 +722,6 @@ class TestSearch(unittest.TestCase):
         match = parse.search('age: {:d}\n', 'name: Rufus\nage: 42\ncolor: red\n', evaluate_result=False)
         r = match.evaluate_result()
         self.assertEqual(r.fixed, (42,))
-
 
 
 class TestFindall(unittest.TestCase):
@@ -777,6 +793,10 @@ class TestBugs(unittest.TestCase):
         self.assertEqual(r[0], 'ALICE')
         self.assertEqual(r[1], 42)
 
+    def test_unmatched_brace_doesnt_match(self):
+        r = parse.parse("{who.txt", "hello")
+        self.assertIsNone(r)
+
 
 # -----------------------------------------------------------------------------
 # TEST SUPPORT FOR: TestParseType
@@ -798,7 +818,6 @@ class TestParseType(unittest.TestCase):
     def assert_fixed_mismatch(self, parser, text):
         result = parser.parse(text)
         self.assertEqual(result, None)
-
 
     def test_pattern_should_be_used(self):
         def parse_number(text):
@@ -930,11 +949,41 @@ class TestParseType(unittest.TestCase):
 
     def test_decimal_value(self):
         value = Decimal('5.5')
-        # ORIGINAL: str_ = 'test {}'.format(value)
-        # HINT: string-format w/ empty braces only for Python2.7 or newer
-        str_ = 'test {0}'.format(value)
+        str_ = 'test {}'.format(value)
         parser = parse.Parser('test {:F}')
         self.assertEqual(parser.parse(str_)[0], value)
+
+    def test_width_str(self):
+        res = parse.parse('{:.2}{:.2}', 'look')
+        self.assertEqual(res.fixed, ('lo', 'ok'))
+        res = parse.parse('{:2}{:2}', 'look')
+        self.assertEqual(res.fixed, ('lo', 'ok'))
+        res = parse.parse('{:4}{}', 'look at that')
+        self.assertEqual(res.fixed, ('look', ' at that'))
+
+    def test_width_constraints(self):
+        res = parse.parse('{:4}', 'looky')
+        self.assertEqual(res.fixed, ('looky', ))
+        res = parse.parse('{:4.4}', 'looky')
+        self.assertIsNone(res)
+        res = parse.parse('{:4.4}', 'ook')
+        self.assertIsNone(res)
+        res = parse.parse('{:4}{:.4}', 'look at that')
+        self.assertEqual(res.fixed, ('look at ', 'that'))
+
+    def test_width_multi_int(self):
+        res = parse.parse('{:02d}{:02d}', '0440')
+        self.assertEqual(res.fixed, (4, 40))
+        res = parse.parse('{:03d}{:d}', '04404')
+        self.assertEqual(res.fixed, (44, 4))
+
+    def test_width_empty_input(self):
+        res = parse.parse('{:.2}', '')
+        self.assertIsNone(res)
+        res = parse.parse('{:2}', 'l')
+        self.assertIsNone(res)
+        res = parse.parse('{:2d}', '')
+        self.assertIsNone(res)
 
 
 if __name__ == '__main__':
