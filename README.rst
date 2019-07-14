@@ -252,10 +252,10 @@ Extended Parser with CardinalityField support
 
 The parser extends the ``parse.Parser`` and adds the following functionality:
 
-   * supports the CardinalityField naming scheme
-   * automatically creates missing type variants for types with
-     a CardinalityField by using the primary type converter for cardinality=1
-   * extends the provide type converter dictionary with new type variants.
+* supports the CardinalityField naming scheme
+* automatically creates missing type variants for types with
+  a CardinalityField by using the primary type converter for cardinality=1
+* extends the provide type converter dictionary with new type variants.
 
 Example:
 
