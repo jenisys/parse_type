@@ -131,24 +131,41 @@ def prepare(ctx, new_version=None, version_part=None, hide=True,
 
 
 @task
-def upload(ctx, repo=None, dry_run=False, skip_existing=False):
+def upload(ctx, repo=None, repo_url=None, dry_run=False,
+           skip_existing=False, verbose=False):
     """Upload release packages to repository (artifact-store)."""
-    original_ctx = ctx
-    opts = ""
     if repo is None:
         repo = ctx.project.repo or "pypi"
+    if repo_url is None:
+        repo_url = ctx.project.repo_url or None
+    original_ctx = ctx
     if dry_run:
         ctx = DryRunContext(ctx)
+
+    # -- OPTIONS:
+    opts = []
+    if repo_url:
+        opts.append("--repository-url={0}".format(repo_url))
+    elif repo:
+        opts.append("--repository={0}".format(repo))
     if skip_existing:
-        opts = "--skip-existing"
+        opts.append("--skip-existing")
+    if verbose:
+        opts.append("--verbose")
 
     packages = ensure_packages_exist(original_ctx)
     print_packages(packages)
+    ctx.run("twine upload {opts} dist/*".format(opts=" ".join(opts)))
+
     # ctx.run("twine upload --repository={repo} dist/*".format(repo=repo))
     # 2018-05-05 WORK-AROUND for new https://pypi.org/:
     #   twine upload --repository-url=https://upload.pypi.org/legacy /dist/*
-    ctx.run("twine upload --repository={repo} {opts} dist/*".format(
-            repo=repo, opts=opts))
+    # NOT-WORKING: repo_url = "https://upload.pypi.org/simple/"
+    #
+    # ctx.run("twine upload --repository-url={repo_url} {opts} dist/*".format(
+    #    repo_url=repo_url, opts=" ".join(opts)))
+    # ctx.run("twine upload --repository={repo} {opts} dist/*".format(
+    #         repo=repo, opts=" ".join(opts)))
 
 
 # -- DEPRECATED: Use RTD instead
@@ -204,5 +221,6 @@ namespace = Collection(bump_version, checklist, prepare, build_packages, upload)
 namespace.configure({
     "project": {
         "repo": "pypi",
+        "repo_url": None,
     }
 })

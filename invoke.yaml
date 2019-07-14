@@ -10,6 +10,9 @@
 
 project:
     name: parse_type
+    repo: "pypi"
+    # -- TODO: until upload problems are resolved.
+    repo_url: "https://upload.pypi.org/legacy/"
 
 tasks:
      auto_dash_names: false
