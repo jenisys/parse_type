@@ -145,6 +145,8 @@ def upload(ctx, repo=None, dry_run=False, skip_existing=False):
     packages = ensure_packages_exist(original_ctx)
     print_packages(packages)
     # ctx.run("twine upload --repository={repo} dist/*".format(repo=repo))
+    # 2018-05-05 WORK-AROUND for new https://pypi.org/:
+    #   twine upload --repository-url=https://upload.pypi.org/legacy /dist/*
     ctx.run("twine upload --repository={repo} {opts} dist/*".format(
             repo=repo, opts=opts))
 
@@ -172,6 +174,7 @@ def print_packages(packages):
         package_size = package.stat().st_size
         package_time = package.stat().st_mtime
         print("  - %s  (size=%s)" % (package, package_size))
+
 
 def ensure_packages_exist(ctx, pattern=None, check_only=False):
     if pattern is None:

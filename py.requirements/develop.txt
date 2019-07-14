@@ -12,7 +12,11 @@ pathlib;    python_version <= '3.4'
 pycmd
 
 # -- PROJECT ADMIN SUPPORT:
-bumpversion
+# OLD: bumpversion
+bump2version >= 0.5.6
+
+# -- RELEASE MANAGEMENT: Push package to pypi.
+twine >= 1.13.0
 
 # -- PYTHON2/PYTHON3 COMPATIBILITY:
 modernize >= 0.5
