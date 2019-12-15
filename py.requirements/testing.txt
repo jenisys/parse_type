@@ -2,7 +2,7 @@
 # PYTHON PACKAGE REQUIREMENTS FOR: parse_type -- For testing only
 # ============================================================================
 
-pytest >= 3.2
+pytest >= 4.2
 pytest-html >= 1.16
 pytest-cov
 pytest-runner

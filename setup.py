@@ -1,19 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+Setup script for "parse_type" package.
 
-wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
-python ez_setup.py
+USAGE:
+    python setup.py install
+    # OR:
+    pip install .
 
 SEE ALSO:
-  * http://pypi.python.org/pypi/parse_type
-  * https://github.com/jenisys/parse_type
+
+* https://pypi.org/pypi/parse_type
+* https://github.com/jenisys/parse_type
 
 RELATED:
-  * http://pypi.python.org/pypi/setuptools
-  * https://bitbucket.org/pypa/setuptools/
-  * https://pythonhosted.org/setuptools/
-  * https://pythonhosted.org/setuptools/setuptools.html
+
+* https://setuptools.readthedocs.io/en/latest/history.html
 """
 
 import sys
@@ -34,7 +36,10 @@ README = os.path.join(HERE, "README.rst")
 long_description = ''.join(open(README).readlines()[4:])
 extra = dict(
     tests_require=[
-        "pytest >= 3.0",
+        "pytest <  5.0; python_version <  '3.0'", # >= 4.2
+        "pytest >= 5.0; python_version >= '3.0'",
+        "pytest-html >= 1.19.0",
+        # -- PYTHON 2.6 SUPPORT:
         "unittest2; python_version < '2.7'",
     ],
 )
@@ -86,7 +91,7 @@ setup(
     # -- REQUIREMENTS:
     python_requires=">=2.6, !=3.0.*, !=3.1.*",
     install_requires=[
-        "parse >= 1.8.4",
+        "parse >= 1.9.1",
         "enum34; python_version < '3.4'",
         "six >= 1.11",
         "ordereddict; python_version < '2.7'",
@@ -94,7 +99,11 @@ setup(
     extras_require={
         'docs': ["sphinx>=1.2"],
         'develop': [
-            "coverage >= 4.4", "pytest >= 3.2", "pytest-cov",
+            "coverage >= 4.4",
+            "pytest <  5.0; python_version <  '3.0'", # >= 4.2
+            "pytest >= 5.0; python_version >= '3.0'",
+            "pytest-html >= 1.19.0",
+            "pytest-cov",
             "tox >= 2.8",
         ],
     },

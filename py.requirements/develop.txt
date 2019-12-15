@@ -3,10 +3,13 @@
 # ============================================================================
 
 # -- DEVELOPMENT SUPPORT:
-invoke >= 0.21.0
+invoke >= 1.2.0
 six >= 1.11.0
-path.py >= 8.2.1
 pathlib;    python_version <= '3.4'
+
+# -- HINT: path.py => path (python-install-package was renamed for python3)
+path.py >= 11.5.0; python_version <  '3.5'
+path >= 13.1.0;    python_version >= '3.5'
 
 # For cleanup of python files: py.cleanup
 pycmd
@@ -26,3 +29,6 @@ pylint
 # -- RELATED:
 -r testing.txt
 -r docs.txt
+
+# -- DISABLED:
+# -r optional.txt
