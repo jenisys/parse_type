@@ -26,7 +26,7 @@ import re
 
 # -- EXTENSION:
 import os
-PARSE_MODULE = os.environ.get("PARSE_TYPE_PARSE_MODULE", "parse_type.parse")
+PARSE_MODULE = os.environ.get("PARSE_TYPE_PARSE_MODULE", "parse")
 if PARSE_MODULE.startswith("parse_type"):
     # -- USE VENDOR MODULE: parse_type.parse (probably older that original)
     from parse_type import parse
@@ -438,6 +438,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_number_twice(self):
         """Verifies that memory-effect does not occur (issue #121)."""
+        from parse_type import parse    # UNTIL: Issue #121 is fixed (in parse > 1.17.0)
         parser = parse.Parser("{:d}")
         result1 = parser.parse("0x12")
         self.assertEqual(result1.fixed[0], 18)

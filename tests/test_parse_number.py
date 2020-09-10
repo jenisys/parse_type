@@ -5,7 +5,9 @@ Related to auto-detection of number base (base=10, 2, 8, 16).
 """
 
 import pytest
-import parse
+# DISABLED: issue #121 in parse v1.17.0
+# DISABLED: import parse
+from parse_type import parse
 
 def assert_parse_number_with_format_d(text, expected):
     parser = parse.Parser("{value:d}")

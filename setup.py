@@ -89,9 +89,12 @@ setup(
     include_package_data = True,
 
     # -- REQUIREMENTS:
-    python_requires=">=2.6, !=3.0.*, !=3.1.*",
+    python_requires=">=2.7, !=3.0.*, !=3.1.*",
     install_requires=[
-        "parse >= 1.9.1",
+        "parse >= 1.17.0; python_version >= '3.0'",
+        "parse >= 1.13.1; python_version <= '2.7'",
+        # -- MAYBE, related to issue #15:
+        # "parse == 1.13.1; python_version <= '2.7'",
         "enum34; python_version < '3.4'",
         "six >= 1.11",
         "ordereddict; python_version < '2.7'",
