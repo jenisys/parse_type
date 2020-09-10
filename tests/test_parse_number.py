@@ -3,6 +3,7 @@
 Additional unit tests for the :mod`parse` module.
 Related to auto-detection of number base (base=10, 2, 8, 16).
 """
+
 import pytest
 import parse
 
@@ -10,7 +11,6 @@ def assert_parse_number_with_format_d(text, expected):
     parser = parse.Parser("{value:d}")
     result = parser.parse(text)
     assert result.named == dict(value=expected)
-
 
 @pytest.mark.parametrize("text, expected", [
     ("123", 123)
@@ -40,3 +40,15 @@ def test_parse_number_with_base8(text, expected):
 ])
 def test_parse_number_with_base16(text, expected):
     assert_parse_number_with_format_d(text, expected)
+
+
+@pytest.mark.parametrize("text1, expected1, text2, expected2", [
+    ("0x12", 18, "12", 12)
+])
+def test_parse_number_twice(text1, expected1, text2, expected2):
+    """ENSURE: Issue #121 int_convert memory effect is fixed."""
+    parser = parse.Parser("{:d}")
+    result1 = parser.parse(text1)
+    result2 = parser.parse(text2)
+    assert result1.fixed[0] == expected1
+    assert result2.fixed[0] == expected2
