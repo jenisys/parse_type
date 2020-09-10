@@ -9,10 +9,10 @@ from parse_type.cardinality import Cardinality
 from parse_type.builder import TypeBuilder, build_type_dict
 
 __all__ = ["Cardinality", "TypeBuilder", "build_type_dict"]
-__version__ = "0.5.4"
+__version__ = "0.5.5"
 
 # -----------------------------------------------------------------------------
-# Copyright (c) 2012-2019 by Jens Engel (https://github/jenisys/)
+# Copyright (c) 2012-2020 by Jens Engel (https://github/jenisys/)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
