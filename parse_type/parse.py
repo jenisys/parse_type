@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 # BASED-ON: https://github.com/r1chardj0n3s/parse/parse.py
-# VERSION:  parse 1.17.0_POST_JE_FIX-ISSUE_121_PULL-REQUEST_122
+# VERSION:  parse 1.18.0
 # Same as original parse modules.
 #
 # pylint: disable=line-too-long, invalid-name, too-many-locals, too-many-arguments
@@ -390,8 +390,7 @@ the pattern, the actual match represents the shortest successful match for
 
 ----
 
-**Version history (in brief)**:
-
+- 1.18.0 Correct bug in int parsing introduced in 1.16.0 (thanks @maxxk)
 - 1.17.0 Make left- and center-aligned search consume up to next space
 - 1.16.0 Make compiled parse objects pickleable (thanks @martinResearch)
 - 1.15.0 Several fixes for parsing non-base 10 numbers (thanks @vladikcomper)
@@ -473,7 +472,7 @@ See the end of the source file for the license of use.
 
 from __future__ import absolute_import
 
-__version__ = '1.17.0'
+__version__ = '1.18.0'
 
 # yes, I now have two problems
 import re
@@ -549,11 +548,10 @@ class int_convert:
             sign = 1
             number_start = 0
 
-        # If base wasn't specified, detect it automatically
         base = self.base
+        # If base wasn't specified, detect it automatically
         if base is None:
-            # -- AVOID MEMORY-EFFECT:
-            # If base is unspecified, it must be discovered every time.
+
             # Assume decimal number, unless different base is detected
             base = 10
 
@@ -566,7 +564,7 @@ class int_convert:
                 elif string[number_start + 1] in 'xX':
                     base = 16
 
-        chars = int_convert.CHARS[:base]
+        chars = int_convert.CHARS[: base]
         string = re.sub('[^%s]' % chars, '', string.lower())
         return sign * int(string, base)
 

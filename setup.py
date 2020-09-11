@@ -91,7 +91,7 @@ setup(
     # -- REQUIREMENTS:
     python_requires=">=2.7, !=3.0.*, !=3.1.*",
     install_requires=[
-        "parse >= 1.17.0; python_version >= '3.0'",
+        "parse >= 1.18.0; python_version >= '3.0'",
         "parse >= 1.13.1; python_version <= '2.7'",
         # -- MAYBE, related to issue #15:
         # "parse == 1.13.1; python_version <= '2.7'",

@@ -4,10 +4,14 @@ Additional unit tests for the :mod`parse` module.
 Related to auto-detection of number base (base=10, 2, 8, 16).
 """
 
+from __future__ import absolute_import, print_function
 import pytest
-# DISABLED: issue #121 in parse v1.17.0
-# DISABLED: import parse
-from parse_type import parse
+import parse
+parse_version = parse.__version__
+print("USING: parse-%s" % parse_version)
+if parse_version in ("1.17.0", "1.16.0"):
+    print("USING: parse_type.parse (INSTEAD)")
+    from parse_type import parse
 
 def assert_parse_number_with_format_d(text, expected):
     parser = parse.Parser("{value:d}")

@@ -436,15 +436,6 @@ class TestParse(unittest.TestCase):
         y('a {:b} b', 'a +1010 b', 10)
         y('a {:x} b', 'a +1010 b', 0x1010)
 
-    def test_parse_number_twice(self):
-        """Verifies that memory-effect does not occur (issue #121)."""
-        from parse_type import parse    # UNTIL: Issue #121 is fixed (in parse > 1.17.0)
-        parser = parse.Parser("{:d}")
-        result1 = parser.parse("0x12")
-        self.assertEqual(result1.fixed[0], 18)
-        result2 = parser.parse("12")
-        self.assertEqual(result2.fixed[0], 12)
-
     def test_two_datetimes(self):
         r = parse.parse('a {:ti} {:ti} b', 'a 1997-07-16 2012-08-01 b')
         self.assertEqual(len(r.fixed), 2)
@@ -1089,6 +1080,12 @@ class TestParseType(unittest.TestCase):
         self.assertIsNone(res)
         res = parse.parse('{:2d}', '')
         self.assertIsNone(res)
+
+    def test_int_convert_stateless_base(self):
+        parser = parse.Parser("{:d}")
+        self.assertEqual(parser.parse("1234")[0], 1234)
+        self.assertEqual(parser.parse("0b1011")[0], 0b1011)
+
 
 
 if __name__ == '__main__':
