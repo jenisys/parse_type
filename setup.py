@@ -30,38 +30,15 @@ from setuptools import setup, find_packages
 # PREPARE SETUP:
 # -----------------------------------------------------------------------------
 HERE = os.path.dirname(__file__)
-python_version = float('%s.%s' % sys.version_info[:2])
-
 README = os.path.join(HERE, "README.rst")
 long_description = ''.join(open(README).readlines()[4:])
-extra = dict(
-    tests_require=[
-        "pytest <  5.0; python_version <  '3.0'", # >= 4.2
-        "pytest >= 5.0; python_version >= '3.0'",
-        "pytest-html >= 1.19.0",
-        # -- PYTHON 2.6 SUPPORT:
-        "unittest2; python_version < '2.7'",
-    ],
-)
 
-if python_version >= 3.0:
-    extra["use_2to3"] = True
-
-# -- NICE-TO-HAVE:
-# # FILE: setup.cfg -- Use pytest-runner (ptr) as test runner.
-# [aliases]
-# test = ptr
-# USE_PYTEST_RUNNER = os.environ.get("PYSETUP_TEST", "pytest") == "pytest"
-USE_PYTEST_RUNNER = os.environ.get("PYSETUP_TEST", "no") == "pytest"
-if USE_PYTEST_RUNNER:
-    extra["tests_require"].append("pytest-runner")
 
 # -----------------------------------------------------------------------------
 # UTILITY:
 # -----------------------------------------------------------------------------
 def find_packages_by_root_package(where):
-    """
-    Better than excluding everything that is not needed,
+    """Better than excluding everything that is not needed,
     collect only what is needed.
     """
     root_package = os.path.basename(where)
@@ -98,6 +75,13 @@ setup(
         "enum34; python_version < '3.4'",
         "six >= 1.11",
         "ordereddict; python_version < '2.7'",
+    ],
+    tests_require=[
+        "pytest <  5.0; python_version <  '3.0'", # >= 4.2
+        "pytest >= 5.0; python_version >= '3.0'",
+        "pytest-html >= 1.19.0",
+        # -- PYTHON 2.6 SUPPORT:
+        "unittest2; python_version < '2.7'",
     ],
     extras_require={
         'docs': ["sphinx>=1.2"],
@@ -136,5 +120,4 @@ setup(
         "License :: OSI Approved :: BSD License",
     ],
     platforms = ['any'],
-    **extra
 )
