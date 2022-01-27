@@ -1,8 +1,77 @@
 Version History
 ===============================================================================
 
-Version: 0.4.3 (2018-04-xx, unreleased)
+
+Version: 0.6.0 (2022-01-18)
 -------------------------------------------------------------------------------
+
+FIXED:
+
++ issue #17: setup.py: Remove use of "use_2to3" (submitted by: xxx)
+
+
+Version: 0.5.6 (2020-09-11)
+-------------------------------------------------------------------------------
+
+FIXED:
+
++ parse issue #119 (same as: #121): int_convert memory effect with number-base discovery
++ UPDATE to parse v1.18.0 (needed by: parse issue #119)
+
+
+Version: 0.5.5 (2020-09-10)
+-------------------------------------------------------------------------------
+
+FIXED:
+
++ parse PR #122: Fixes issue #121 in parse: int_convert memory effect.
+
+
+Version: 0.5.4 (2020-09-10)
+-------------------------------------------------------------------------------
+
+UPDATED:
+
++ parse v1.17.0
+
+
+Version: 0.5.3 (2019-12-15)
+-------------------------------------------------------------------------------
+
+UPDATED:
+
++ setup.py: Add support for Python 3.8.
++ UPDATE: Dependencies
+
+
+Version: 0.5.2 (2019-07-14)
+-------------------------------------------------------------------------------
+
+UPDATED:
+
++ parse v1.12.0
+
+FIXED:
+
++ Python3 DeprecationWarning for regex (here: in docstrings).
+
+
+Version: 0.5.1 (2018-05-27)
+-------------------------------------------------------------------------------
+
+CHANGED:
+
++ Add parse_type.cfparse.Parser(..., case_sensitive=False, ...) parameter
+  to match functionality in parse.Parser constructor (in parse-1.8.4).
++ UPDATE to parse-1.8.4
+
+
+Version: 0.5.0 (2018-04-08; includes: v0.4.3)
+-------------------------------------------------------------------------------
+
+FIXED:
+
++ FIX doctest for parse_type.parse module.
 
 CHANGES:
 
