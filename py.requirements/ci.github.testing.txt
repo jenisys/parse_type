@@ -10,3 +10,5 @@ ordereddict; python_version < '2.7'
 # HINT: path.py => path (python-install-package was renamed for python3)
 path.py >= 11.5.0; python_version <  '3.5'
 path >= 13.1.0;    python_version >= '3.5'
+
+-r basic.txt

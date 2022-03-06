@@ -8,7 +8,7 @@ Version: 0.7.0 (UNRELEASED)
 DEVELOPMENT:
 
 * Renamed default branch of Git repository to "main" (was: "master").
-
+* Use github-actions as CI/CD pipeline.
 
 Version: 0.6.0 (2022-01-18)
 -------------------------------------------------------------------------------

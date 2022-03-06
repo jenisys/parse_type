@@ -2,9 +2,9 @@
 parse_type
 ===============================================================================
 
-.. image:: https://img.shields.io/travis/jenisys/parse_type/master.svg
-    :target: https://travis-ci.org/jenisys/parse_type
-    :alt: Travis CI Build Status
+.. image:: https://github.com/jenisys/parse_type/actions/workflows/tests.yml/badge.svg
+    :target: https://github.com/jenisys/parse_type/actions/workflows/tests.yml
+    :alt: CI Build Status
 
 .. image:: https://img.shields.io/pypi/v/parse_type.svg
     :target: https://pypi.python.org/pypi/parse_type
