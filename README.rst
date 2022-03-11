@@ -2,8 +2,8 @@
 parse_type
 ===============================================================================
 
-.. image:: https://github.com/jenisys/parse_type/actions/workflows/tests.yml/badge.svg
-    :target: https://github.com/jenisys/parse_type/actions/workflows/tests.yml
+.. image:: https://github.com/jenisys/parse_type/actions/workflows/test.yml/badge.svg
+    :target: https://github.com/jenisys/parse_type/actions/workflows/test.yml
     :alt: CI Build Status
 
 .. image:: https://img.shields.io/pypi/v/parse_type.svg
