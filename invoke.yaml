@@ -19,7 +19,6 @@ tasks:
 
 run:
     echo: true
-    # DISABLED: pty:  true
 
 cleanup_all:
     extra_directories:
@@ -27,4 +26,7 @@ cleanup_all:
       - dist
       - .hypothesis
       - .pytest_cache
-
+      - ".venv*"
+      - ".tox"
+    extra_files:
+      - ".done.*"
