@@ -19,8 +19,8 @@ set dotenv-load
 # CONFIG:
 # -----------------------------------------------------------------------------
 HERE := justfile_directory()
-PYTEST_OPTIONS := env_var_or_default("PYTEST_OPTIONS", "")
 PIP_INSTALL_OPTIONS := env_var_or_default("PIP_INSTALL_OPTIONS", "--quiet")
+PYTEST_OPTIONS := env_var_or_default("PYTEST_OPTIONS", "")
 
 
 # -----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ PIP_INSTALL_OPTIONS := env_var_or_default("PIP_INSTALL_OPTIONS", "--quiet")
 # -----------------------------------------------------------------------------
 
 # DEFAULT-TARGET: Ensure that packages are installed and runs tests.
-default: (ensure-install-packages "testing") test
+default: (_ensure-install-packages "testing") test
 
 # PART=all, testing, ...
 install-packages PART="all":
@@ -37,7 +37,7 @@ install-packages PART="all":
     @touch "{{HERE}}/.done.install-packages.{{PART}}"
 
 # ENSURE: Python packages are installed.
-ensure-install-packages PART="all":
+_ensure-install-packages PART="all":
     #!/usr/bin/env python3
     from subprocess import run
     from os import path
@@ -45,7 +45,7 @@ ensure-install-packages PART="all":
         run("just install-packages {{PART}}", shell=True)
 
 # -- SIMILAR: This solution requires a Bourne-like shell (may not work on: Windows).
-# ensure-install-packages PART="testing":
+# _ensure-install-packages PART="testing":
 #   @test -e "{{HERE}}/.done.install-packages.{{PART}}" || just install-packages {{PART}}
 
 # Run tests.
@@ -60,7 +60,7 @@ coverage:
     coverage html
 
 # Cleanup most parts (but leave PRECIOUS parts).
-cleanup: (ensure-install-packages "all")
+cleanup: (_ensure-install-packages "all")
     invoke cleanup
 
 # Cleanup everything.
