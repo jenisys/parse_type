@@ -26,6 +26,7 @@ cleanup_all:
       - dist
       - .hypothesis
       - .pytest_cache
+      - .ruff_cache
       - ".venv*"
       - ".tox"
     extra_files:
