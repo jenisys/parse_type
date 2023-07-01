@@ -73,15 +73,12 @@ setup(
         # -- MAYBE, related to issue #15:
         # "parse == 1.13.1; python_version <= '2.7'",
         "enum34; python_version < '3.4'",
-        "six >= 1.11",
-        "ordereddict; python_version < '2.7'",
+        "six >= 1.15",
     ],
     tests_require=[
         "pytest <  5.0; python_version <  '3.0'", # >= 4.2
         "pytest >= 5.0; python_version >= '3.0'",
         "pytest-html >= 1.19.0",
-        # -- PYTHON 2.6 SUPPORT:
-        "unittest2; python_version < '2.7'",
     ],
     extras_require={
         'docs': ["sphinx>=1.2"],
@@ -91,7 +88,7 @@ setup(
             "pytest >= 5.0; python_version >= '3.0'",
             "pytest-html >= 1.19.0",
             "pytest-cov",
-            "tox >= 2.8",
+            "tox >=2.8,<4.0",
         ],
     },
 
@@ -100,7 +97,7 @@ setup(
     zip_safe = True,
 
     classifiers = [
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",

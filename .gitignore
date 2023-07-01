@@ -17,14 +17,17 @@ Pipfile.lock
 
 # Unit test / coverage reports
 .cache/
+.direnv/
 .eggs/
 .pytest_cache/
+.ruff_cache/
 .tox/
 .venv*/
 .coverage
 .done.*
 
 # -- IDE-RELATED:
+.fleet/
 .idea/
 .vscode/
 .project

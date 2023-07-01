@@ -11,4 +11,3 @@
 -r basic.txt
 -r develop.txt
 -r testing.txt
--r py26_more.txt
