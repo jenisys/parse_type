@@ -4,9 +4,11 @@
 
 name: tests
 on:
+  workflow_dispatch:
   push:
+    branches: [ "main", "release/**" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   test:
