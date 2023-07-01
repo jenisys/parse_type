@@ -1,6 +1,6 @@
 # -*- encoding: utf8 -*-
 # -- BASED-ON: https://github.com/r1chardj0n3s/parse/test_parse.py
-# VERSION:  parse 1.17.0_POST_JE_FIX-ISSUE_121_PULL-REQUEST_122
+# VERSION:  parse v1.19.1
 # Same as original file but uses bundled :mod:`parse_type.parse` module
 # instead of :mod:`parse` module
 #
@@ -58,6 +58,11 @@ class TestPattern(unittest.TestCase):
         # pull a named string out of another string
         self._test_expression('{name:w}', r'(?P<name>\w+)')
         self._test_expression('{name:w} {other:w}', r'(?P<name>\w+) (?P<other>\w+)')
+
+    def test_numbered(self):
+        self._test_expression('{0}', r'(.+?)')
+        self._test_expression('{0} {1}', r'(.+?) (.+?)')
+        self._test_expression('{0:f} {1:f}', r'([-+ ]?\d*\.\d+) ([-+ ]?\d*\.\d+)')
 
     def test_bird(self):
         # skip some trailing whitespace
@@ -126,6 +131,14 @@ class TestResult(unittest.TestCase):
         self.assertEqual(r[1], 2)
         self.assertRaises(IndexError, r.__getitem__, 2)
         self.assertRaises(KeyError, r.__getitem__, 'spam')
+
+    def test_slice_access(self):
+        r = parse.Result((1, 2, 3, 4), {}, None)
+        self.assertEqual(r[1:3], (2, 3))
+        self.assertEqual(r[-5:5], (1, 2, 3, 4))
+        self.assertEqual(r[:4:2], (1, 3))
+        self.assertEqual(r[::-2], (4, 2))
+        self.assertEqual(r[5:10], tuple())
 
     def test_named_access(self):
         r = parse.Result((), {'spam': 'ham'}, None)
@@ -213,6 +226,17 @@ class TestParse(unittest.TestCase):
         self.assertEqual(r.fixed, (12, 'people'))
         r = parse.parse('hello {:w} {:w}', 'hello 12 people')
         self.assertEqual(r.fixed, ('12', 'people'))
+
+    def test_sign(self):
+        # sign is ignored
+        r = parse.parse('Pi = {:.7f}', 'Pi = 3.1415926')
+        self.assertEqual(r.fixed, (3.1415926,))
+        r = parse.parse('Pi = {:+.7f}', 'Pi = 3.1415926')
+        self.assertEqual(r.fixed, (3.1415926,))
+        r = parse.parse('Pi = {:-.7f}', 'Pi = 3.1415926')
+        self.assertEqual(r.fixed, (3.1415926,))
+        r = parse.parse('Pi = {: .7f}', 'Pi = 3.1415926')
+        self.assertEqual(r.fixed, (3.1415926,))
 
     def test_precision(self):
         # pull a float out of a string
@@ -874,17 +898,27 @@ class TestBugs(unittest.TestCase):
         # prior to the fix, this would raise an AttributeError
         pickle.dumps(p)
 
-    def test_search_centered_bug_112(self):
-        r = parse.parse("{:^},{:^}", " 12 , 34 ")
-        self.assertEqual(r[1], "34")
-        r = parse.search("{:^},{:^}", " 12 , 34 ")
-        self.assertEqual(r[1], "34")
 
-    def test_search_left_align_bug_112(self):
-        r = parse.parse("{:<},{:<}", "12 ,34 ")
-        self.assertEqual(r[1], "34")
-        r = parse.search("{:<},{:<}", "12 ,34 ")
-        self.assertEqual(r[1], "34")
+    def test_unused_centered_alignment_bug(self):
+        r = parse.parse("{:^2S}", "foo")
+        self.assertEqual(r[0], "foo")
+        r = parse.search("{:^2S}", "foo")
+        self.assertEqual(r[0], "foo")
+
+        # specifically test for the case in issue #118 as well
+        r = parse.parse("Column {:d}:{:^}", "Column 1: Timestep")
+        self.assertEqual(r[0], 1)
+        self.assertEqual(r[1], "Timestep")
+
+    def test_unused_left_alignment_bug(self):
+        r = parse.parse("{:<2S}", "foo")
+        self.assertEqual(r[0], "foo")
+        r = parse.search("{:<2S}", "foo")
+        self.assertEqual(r[0], "foo")
+
+    def test_match_trailing_newline(self):
+        r = parse.parse('{}', 'test\n')
+        self.assertEqual(r[0], 'test\n')
 
 
 # -----------------------------------------------------------------------------
