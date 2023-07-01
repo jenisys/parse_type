@@ -7,9 +7,11 @@ Related to auto-detection of number base (base=10, 2, 8, 16).
 from __future__ import absolute_import, print_function
 import pytest
 import parse
+
 parse_version = parse.__version__
 print("USING: parse-%s" % parse_version)
 if parse_version in ("1.17.0", "1.16.0"):
+    # -- REQUIRES: parse >= 1.18.0 -- WORKAROUND HERE
     print("USING: parse_type.parse (INSTEAD)")
     from parse_type import parse
 
