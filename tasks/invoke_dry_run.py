@@ -16,6 +16,25 @@ Basic support to use a --dry-run mode w/ invoke tasks.
 """
 
 from __future__ import print_function
+from contextlib import contextmanager
+
+@contextmanager
+def dry_run_mode(ctx):
+    """Contextmanages/scope-guard that switches into dry-run mode.
+    Afterwards the original mode is restored.
+
+    .. code-block:: python
+
+        with dry_run_mode(ctx):
+            ctx.run(...)
+    """
+    # -- SETUP PHASE:
+    initial_dry_run = ctx.config.run.dry
+    ctx.config.run.dry = True
+    yield ctx
+    # -- CLEANUP PHASE:
+    ctx.config.run.dry = initial_dry_run
+
 
 class DryRunContext(object):
     PREFIX = "DRY-RUN: "
@@ -31,6 +50,11 @@ class DryRunContext(object):
         self.ctx = ctx
         self.prefix = prefix
         self.schema = schema
+        self.ctx.config.run.dry = True
+
+    @property
+    def config(self):
+        return self.ctx.config
 
     def run(self, command, **kwargs):
         message = self.schema.format(command=command,

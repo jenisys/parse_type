@@ -12,17 +12,7 @@ Show all tasks with::
     * https://github.com/pyinvoke/invoke
 """
 
-from __future__ import absolute_import
-
-# -----------------------------------------------------------------------------
-# BOOTSTRAP PATH: Use provided vendor bundle if "invoke" is not installed
-# -----------------------------------------------------------------------------
-from . import _setup    # pylint: disable=wrong-import-order
-import os.path
-import sys
-INVOKE_MINVERSION = "1.2.0"
-_setup.setup_path()
-_setup.require_invoke_minversion(INVOKE_MINVERSION)
+from __future__ import absolute_import, print_function
 
 # -----------------------------------------------------------------------------
 # IMPORTS:
@@ -31,7 +21,7 @@ import sys
 from invoke import Collection
 
 # -- TASK-LIBRARY:
-from . import _tasklet_cleanup as cleanup
+import invoke_cleanup as cleanup
 from . import test
 from . import release
 # DISABLED: from . import docs
