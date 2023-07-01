@@ -18,6 +18,13 @@ modernize >= 0.5
 ruff
 pylint
 
+# -- TEST SUPPORT: CODE COVERAGE SUPPORT, ...
+coverage >= 4.4
+pytest-cov
+
+tox >= 2.8,<4.0
+argparse    # -- NEEDED-FOR: toxcmd.py
+
 # -- RELATED:
 -r testing.txt
 -r docs.txt
