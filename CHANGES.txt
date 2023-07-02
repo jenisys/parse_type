@@ -5,10 +5,31 @@ Version History
 Version: 0.7.0 (UNRELEASED)
 -------------------------------------------------------------------------------
 
+GOALS:
+
+* Drop support for Python 2.7
+* Support Python >= 3.7 (probably)
+
+
+Version: 0.6.1 (2023-07-02)
+-------------------------------------------------------------------------------
+
+* Switch to MIT license (same as: `parse`_ module)
+* Use SPDX-License-Identifier in source code (to simplify understanding)
+* UPDATE/SYNC to `parse`_ v1.19.1
+* ADDED: ``pyproject.toml`` to support newer ``pip`` versions
+  REASON: ``setup.py`` becomes DEPRECATED in 2023-09 for newer ``pip`` versions.
+
+FIXED:
+
+* Issue #19: 0.6.0: pytest is failing in two units (submitted by: kloczek; caused by: `parse`_ v1.19.1)
+* Issue #1:  Licensing confusion
+
 DEVELOPMENT:
 
-* Renamed default branch of Git repository to "main" (was: "master").
-* Use github-actions as CI/CD pipeline.
+* VCS: Renamed default branch of Git repository to "main" (was: "master").
+* CI:  Use github-actions as CI pipeline.
+
 
 Version: 0.6.0 (2022-01-18)
 -------------------------------------------------------------------------------
@@ -90,3 +111,6 @@ BACKWARD INCOMPATIBLE CHANGES:
 
 * RENAMED: type_converter.regex_group_count attribute (was: .group_count)
   (pull-request review changes of the ``parse`` module).
+
+
+.. _parse: https://github.com/r1chardj0n3s/parse
