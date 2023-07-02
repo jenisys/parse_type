@@ -9,12 +9,15 @@ include *.ini
 include *.cfg
 include *.yaml
 include bin/invoke*
+exclude __*.rst
+exclude __*.txt
 
-recursive-include bin           *.sh *.py *.cmd
+recursive-include bin            *.cmd *.py *.sh
 recursive-include py.requirements  *.txt
-recursive-include tasks         *.py *.txt *.rst *.zip
+recursive-include tasks         *.py *.txt
 recursive-include tests         *.py
 # -- DISABLED: recursive-include docs          *.rst *.txt *.py
 
+prune .direnv
 prune .tox
 prune .venv*

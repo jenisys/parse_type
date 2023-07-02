@@ -9,7 +9,9 @@
 bump2version >= 0.5.6
 
 # -- RELEASE MANAGEMENT: Push package to pypi.
+build >= 0.5.1
 twine >= 1.13.0
+wheel
 
 # -- PYTHON2/PYTHON3 COMPATIBILITY:
 modernize >= 0.5
@@ -23,7 +25,8 @@ coverage >= 4.4
 pytest-cov
 
 tox   >= 1.8.1,<4.0     # -- HINT: tox >= 4.0 has breaking changes.
-virtualenv < 20.22.0    # -- SUPPORT FOR: Python 2.7, Python <= 3.6
+virtualenv <  20.22.0; python_version <= '3.6'  # -- SUPPORT FOR: Python 2.7, Python <= 3.6
+virtualenv >= 20.0.0;  python_version >  '3.6'
 argparse    # -- NEEDED-FOR: toxcmd.py
 
 # -- RELATED:

@@ -53,7 +53,7 @@ def find_packages_by_root_package(where):
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = "0.6.0",
+    version = "0.6.1",
     author = "Jens Engel",
     author_email = "jenisys@noreply.github.com",
     url = "https://github.com/jenisys/parse_type",
@@ -61,7 +61,7 @@ setup(
     description = "Simplifies to build parse types based on the parse module",
     long_description = long_description,
     keywords= "parse, parsing",
-    license = "BSD",
+    license = "MIT",
     packages = find_packages_by_root_package("parse_type"),
     include_package_data = True,
 
@@ -70,8 +70,6 @@ setup(
     install_requires=[
         "parse >= 1.18.0; python_version >= '3.0'",
         "parse >= 1.13.1; python_version <= '2.7'",
-        # -- MAYBE, related to issue #15:
-        # "parse == 1.13.1; python_version <= '2.7'",
         "enum34; python_version < '3.4'",
         "six >= 1.15",
     ],
@@ -81,14 +79,23 @@ setup(
         "pytest-html >= 1.19.0",
     ],
     extras_require={
-        'docs': ["sphinx>=1.2"],
+        'docs': [
+            "Sphinx >=1.6",
+            "sphinx_bootstrap_theme >= 0.6.0"
+        ],
         'develop': [
+            "build >= 0.5.1",
+            "twine >= 1.13.0",
             "coverage >= 4.4",
-            "pytest <  5.0; python_version <  '3.0'", # >= 4.2
+            "pytest <  5.0; python_version <  '3.0'",  # >= 4.2
             "pytest >= 5.0; python_version >= '3.0'",
             "pytest-html >= 1.19.0",
             "pytest-cov",
             "tox >=2.8,<4.0",
+            "virtualenv <  20.22.0; python_version <= '3.6'",  # -- SUPPORT FOR: Python 2.7, Python <= 3.6
+            "virtualenv >= 20.0.0;  python_version >  '3.6'",
+            "ruff; python_version >=  '3.7'",
+            "pylint",
         ],
     },
 
@@ -101,6 +108,7 @@ setup(
         "Environment :: Console",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.2",
@@ -117,7 +125,6 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Code Generators",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "License :: OSI Approved :: BSD License",
     ],
     platforms = ['any'],
 )

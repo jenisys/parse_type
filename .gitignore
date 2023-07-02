@@ -1,6 +1,6 @@
 *.py[cod]
 
-# Packages
+# -- TEMPORARY PYTHON PACKAGE PARTS:
 MANIFEST
 *.egg
 *.egg-info
@@ -15,7 +15,7 @@ pip-log.txt
 Pipfile
 Pipfile.lock
 
-# Unit test / coverage reports
+# -- TESTS, COVERAGE REPORTS, ...
 .cache/
 .direnv/
 .eggs/
