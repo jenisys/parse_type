@@ -10,7 +10,7 @@ GOALS:
 * Drop support for Python 2.7
 * Support Python >= 3.7 (probably)
 
-Version: 0.6.2 (UNRELEASED)
+Version: 0.6.2 (2023-07-04)
 -------------------------------------------------------------------------------
 
 FIXES:
