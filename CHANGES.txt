@@ -10,6 +10,15 @@ GOALS:
 * Drop support for Python 2.7
 * Support Python >= 3.7 (probably)
 
+Version: 0.6.2 (UNRELEASED)
+-------------------------------------------------------------------------------
+
+FIXES:
+
+* #21: tests/test_parse.py tests ``parse_type.parse`` (per default).
+  REASON: Using for older installed ``parse`` module may cause weird problems.
+  RELATED TO: ``parse v1.19.1`` (behavior changed compared to ``v1.19.0``)
+
 
 Version: 0.6.1 (2023-07-02)
 -------------------------------------------------------------------------------

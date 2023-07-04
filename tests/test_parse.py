@@ -26,9 +26,10 @@ import re
 
 # -- EXTENSION:
 import os
-PARSE_MODULE = os.environ.get("PARSE_TYPE_PARSE_MODULE", "parse")
+PARSE_MODULE = os.environ.get("PARSE_TYPE_PARSE_MODULE", "parse_type")
 if PARSE_MODULE.startswith("parse_type"):
-    # -- USE VENDOR MODULE: parse_type.parse (probably older that original)
+    # -- USE EMBEDDED PARSE MODULE: parse_type.parse
+    # HINT: Has either same version or is older than original module.
     from parse_type import parse
 else:
     # -- USE ORIGINAL MODULE: parse
