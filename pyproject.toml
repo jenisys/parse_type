@@ -54,7 +54,7 @@ dynamic = ["version"]
 
 [project.urls]
 Homepage = "https://github.com/jenisys/parse_type"
-Download = "http://pypi.python.org/pypi/parse_type"
+Download = "https://pypi.org/project/parse_type/"
 "Source Code" = "https://github.com/jenisys/parse_type"
 "Issue Tracker" = "https://github.com/jenisys/parse_type/issues/"
 
