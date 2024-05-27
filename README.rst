@@ -2,22 +2,23 @@
 parse_type
 ===============================================================================
 
-.. image:: https://github.com/jenisys/parse_type/actions/workflows/test.yml/badge.svg
+.. |badge.CI_status| image:: https://github.com/jenisys/parse_type/actions/workflows/test.yml/badge.svg
     :target: https://github.com/jenisys/parse_type/actions/workflows/test.yml
     :alt: CI Build Status
 
-.. image:: https://img.shields.io/pypi/v/parse_type.svg
+.. |badge.latest_version| image:: https://img.shields.io/pypi/v/parse_type.svg
     :target: https://pypi.python.org/pypi/parse_type
     :alt: Latest Version
 
-.. image:: https://img.shields.io/pypi/dm/parse_type.svg
+.. |badge.downloads| image:: https://img.shields.io/pypi/dm/parse_type.svg
     :target: https://pypi.python.org/pypi/parse_type
     :alt: Downloads
 
-.. image:: https://img.shields.io/pypi/l/parse_type.svg
+.. |badge.license| image:: https://img.shields.io/pypi/l/parse_type.svg
     :target: https://pypi.python.org/pypi/parse_type/
     :alt: License
 
+|badge.CI_status| |badge.latest_version| |badge.license| |badge.downloads|
 
 `parse_type`_ extends the `parse`_ module (opposite of `string.format()`_)
 with the following features:
