@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 # BASED-ON: https://github.com/r1chardj0n3s/parse/parse.py
-# VERSION:  parse 1.18.0
+# VERSION:  parse 1.20.2
 # Same as original parse modules.
 #
 # pylint: disable=line-too-long, invalid-name, too-many-locals, too-many-arguments
@@ -13,17 +13,19 @@
 #  -- ORIGINAL-CODE STARTS-HERE ------------------------------------------------
 from __future__ import absolute_import
 
-__version__ = '1.19.1'
-
-# yes, I now have two problems
+import logging
 import re
 import sys
-from datetime import datetime, time, tzinfo, timedelta
+from datetime import datetime
+from datetime import time
+from datetime import timedelta
+from datetime import tzinfo
 from decimal import Decimal
 from functools import partial
-import logging
 
-__all__ = 'parse search findall with_pattern'.split()
+
+__version__ = "1.20.2"
+__all__ = ["parse", "search", "findall", "with_pattern"]
 
 log = logging.getLogger(__name__)
 
@@ -73,16 +75,16 @@ class int_convert:
     It may also have other non-numeric characters that we can ignore.
     """
 
-    CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
+    CHARS = "0123456789abcdefghijklmnopqrstuvwxyz"
 
     def __init__(self, base=None):
         self.base = base
 
     def __call__(self, string, match):
-        if string[0] == '-':
+        if string[0] == "-":
             sign = -1
             number_start = 1
-        elif string[0] == '+':
+        elif string[0] == "+":
             sign = 1
             number_start = 1
         else:
@@ -92,21 +94,20 @@ class int_convert:
         base = self.base
         # If base wasn't specified, detect it automatically
         if base is None:
-
             # Assume decimal number, unless different base is detected
             base = 10
 
             # For number formats starting with 0b, 0o, 0x, use corresponding base ...
-            if string[number_start] == '0' and len(string) - number_start > 2:
-                if string[number_start + 1] in 'bB':
+            if string[number_start] == "0" and len(string) - number_start > 2:
+                if string[number_start + 1] in "bB":
                     base = 2
-                elif string[number_start + 1] in 'oO':
+                elif string[number_start + 1] in "oO":
                     base = 8
-                elif string[number_start + 1] in 'xX':
+                elif string[number_start + 1] in "xX":
                     base = 16
 
         chars = int_convert.CHARS[:base]
-        string = re.sub('[^%s]' % chars, '', string.lower())
+        string = re.sub("[^%s]" % chars, "", string.lower())
         return sign * int(string, base)
 
 
@@ -136,7 +137,7 @@ class FixedTzOffset(tzinfo):
         self._name = name
 
     def __repr__(self):
-        return '<%s %s %s>' % (self.__class__.__name__, self._name, self._offset)
+        return "<%s %s %s>" % (self.__class__.__name__, self._name, self._offset)
 
     def utcoffset(self, dt):
         return self._offset
@@ -149,41 +150,41 @@ class FixedTzOffset(tzinfo):
 
     def __eq__(self, other):
         if not isinstance(other, FixedTzOffset):
-            return False
+            return NotImplemented
         return self._name == other._name and self._offset == other._offset
 
 
-MONTHS_MAP = dict(
-    Jan=1,
-    January=1,
-    Feb=2,
-    February=2,
-    Mar=3,
-    March=3,
-    Apr=4,
-    April=4,
-    May=5,
-    Jun=6,
-    June=6,
-    Jul=7,
-    July=7,
-    Aug=8,
-    August=8,
-    Sep=9,
-    September=9,
-    Oct=10,
-    October=10,
-    Nov=11,
-    November=11,
-    Dec=12,
-    December=12,
-)
-DAYS_PAT = r'(Mon|Tue|Wed|Thu|Fri|Sat|Sun)'
-MONTHS_PAT = r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)'
-ALL_MONTHS_PAT = r'(%s)' % '|'.join(MONTHS_MAP)
-TIME_PAT = r'(\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?)'
-AM_PAT = r'(\s+[AP]M)'
-TZ_PAT = r'(\s+[-+]\d\d?:?\d\d)'
+MONTHS_MAP = {
+    "Jan": 1,
+    "January": 1,
+    "Feb": 2,
+    "February": 2,
+    "Mar": 3,
+    "March": 3,
+    "Apr": 4,
+    "April": 4,
+    "May": 5,
+    "Jun": 6,
+    "June": 6,
+    "Jul": 7,
+    "July": 7,
+    "Aug": 8,
+    "August": 8,
+    "Sep": 9,
+    "September": 9,
+    "Oct": 10,
+    "October": 10,
+    "Nov": 11,
+    "November": 11,
+    "Dec": 12,
+    "December": 12,
+}
+DAYS_PAT = r"(Mon|Tue|Wed|Thu|Fri|Sat|Sun)"
+MONTHS_PAT = r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
+ALL_MONTHS_PAT = r"(%s)" % "|".join(MONTHS_MAP)
+TIME_PAT = r"(\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?)"
+AM_PAT = r"(\s+[AP]M)"
+TZ_PAT = r"(\s+[-+]\d\d?:?\d\d)"
 
 
 def date_convert(
@@ -209,11 +210,11 @@ def date_convert(
         m = groups[mm]
         d = groups[dd]
     elif ymd is not None:
-        y, m, d = re.split(r'[-/\s]', groups[ymd])
+        y, m, d = re.split(r"[-/\s]", groups[ymd])
     elif mdy is not None:
-        m, d, y = re.split(r'[-/\s]', groups[mdy])
+        m, d, y = re.split(r"[-/\s]", groups[mdy])
     elif dmy is not None:
-        d, m, y = re.split(r'[-/\s]', groups[dmy])
+        d, m, y = re.split(r"[-/\s]", groups[dmy])
     elif d_m_y is not None:
         d, m, y = d_m_y
         d = groups[d]
@@ -224,14 +225,14 @@ def date_convert(
 
     H = M = S = u = 0
     if hms is not None and groups[hms]:
-        t = groups[hms].split(':')
+        t = groups[hms].split(":")
         if len(t) == 2:
             H, M = t
         else:
             H, M, S = t
-            if '.' in S:
-                S, u = S.split('.')
-                u = int(float('.' + u) * 1000000)
+            if "." in S:
+                S, u = S.split(".")
+                u = int(float("." + u) * 1000000)
             S = int(S)
         H = int(H)
         M = int(M)
@@ -240,19 +241,19 @@ def date_convert(
         am = groups[am]
         if am:
             am = am.strip()
-        if am == 'AM' and H == 12:
+        if am == "AM" and H == 12:
             # correction for "12" hour functioning as "0" hour: 12:15 AM = 00:15 by 24 hr clock
             H -= 12
-        elif am == 'PM' and H == 12:
+        elif am == "PM" and H == 12:
             # no correction needed: 12PM is midday, 12:00 by 24 hour clock
             pass
-        elif am == 'PM':
+        elif am == "PM":
             H += 12
 
     if tz is not None:
         tz = groups[tz]
-    if tz == 'Z':
-        tz = FixedTzOffset(0, 'UTC')
+    if tz == "Z":
+        tz = FixedTzOffset(0, "UTC")
     elif tz:
         tz = tz.strip()
         if tz.isupper():
@@ -260,14 +261,14 @@ def date_convert(
             pass
         else:
             sign = tz[0]
-            if ':' in tz:
-                tzh, tzm = tz[1:].split(':')
+            if ":" in tz:
+                tzh, tzm = tz[1:].split(":")
             elif len(tz) == 4:  # 'snnn'
                 tzh, tzm = tz[1], tz[2:4]
             else:
                 tzh, tzm = tz[1:3], tz[3:5]
             offset = int(tzm) + int(tzh) * 60
-            if sign == '-':
+            if sign == "-":
                 offset = -offset
             tz = FixedTzOffset(offset, tz)
 
@@ -285,6 +286,66 @@ def date_convert(
     return d
 
 
+def strf_date_convert(x, _, type):
+    is_date = any("%" + x in type for x in "aAwdbBmyYjUW")
+    is_time = any("%" + x in type for x in "HIpMSfz")
+
+    dt = datetime.strptime(x, type)
+    if "%y" not in type and "%Y" not in type:  # year not specified
+        dt = dt.replace(year=datetime.today().year)
+
+    if is_date and is_time:
+        return dt
+    elif is_date:
+        return dt.date()
+    elif is_time:
+        return dt.time()
+    else:
+        ValueError("Datetime not a date nor a time?")
+
+
+# ref: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
+dt_format_to_regex = {
+    "%a": "(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)",
+    "%A": "(?:Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)",
+    "%w": "[0-6]",
+    "%d": "[0-9]{1,2}",
+    "%b": "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)",
+    "%B": "(?:January|February|March|April|May|June|July|August|September|October|November|December)",
+    "%m": "[0-9]{1,2}",
+    "%y": "[0-9]{2}",
+    "%Y": "[0-9]{4}",
+    "%H": "[0-9]{1,2}",
+    "%I": "[0-9]{1,2}",
+    "%p": "(?:AM|PM)",
+    "%M": "[0-9]{2}",
+    "%S": "[0-9]{2}",
+    "%f": "[0-9]{1,6}",
+    "%z": "[+|-][0-9]{2}(:?[0-9]{2})?(:?[0-9]{2})?",
+    # "%Z": punt
+    "%j": "[0-9]{1,3}",
+    "%U": "[0-9]{1,2}",
+    "%W": "[0-9]{1,2}",
+}
+
+# Compile a regular expression pattern that matches any date/time format symbol.
+dt_format_symbols_re = re.compile("|".join(dt_format_to_regex))
+
+
+def get_regex_for_datetime_format(format_):
+    """
+    Generate a regex pattern for a given datetime format string.
+
+    Parameters:
+        format_ (str): The datetime format string.
+
+    Returns:
+        str: A regex pattern corresponding to the datetime format string.
+    """
+    # Replace all format symbols with their regex patterns.
+    return dt_format_symbols_re.sub(lambda m: dt_format_to_regex[m.group(0)], format_)
+
+
 class TooManyFields(ValueError):
     pass
 
@@ -294,44 +355,43 @@ class RepeatedNameError(ValueError):
 
 
 # note: {} are handled separately
-# note: I don't use r'' here because Sublime Text 2 syntax highlight has a fit
-REGEX_SAFETY = re.compile(r'([?\\\\.[\]()*+\^$!\|])')
+REGEX_SAFETY = re.compile(r"([?\\.[\]()*+^$!|])")
 
 # allowed field types
-ALLOWED_TYPES = set(list('nbox%fFegwWdDsSl') + ['t' + c for c in 'ieahgcts'])
+ALLOWED_TYPES = set(list("nbox%fFegwWdDsSl") + ["t" + c for c in "ieahgcts"])
 
 
 def extract_format(format, extra_types):
     """Pull apart the format [[fill]align][sign][0][width][.precision][type]"""
     fill = align = None
-    if format[0] in '<>=^':
+    if format[0] in "<>=^":
         align = format[0]
         format = format[1:]
-    elif len(format) > 1 and format[1] in '<>=^':
+    elif len(format) > 1 and format[1] in "<>=^":
         fill = format[0]
         align = format[1]
         format = format[2:]
 
-    if format.startswith(('+', '-', ' ')):
+    if format.startswith(("+", "-", " ")):
         format = format[1:]
 
     zero = False
-    if format and format[0] == '0':
+    if format and format[0] == "0":
         zero = True
         format = format[1:]
 
-    width = ''
+    width = ""
     while format:
         if not format[0].isdigit():
             break
         width += format[0]
         format = format[1:]
 
-    if format.startswith('.'):
+    if format.startswith("."):
         # Precision isn't needed but we need to capture it so that
         # the ValueError isn't raised.
         format = format[1:]  # drop the '.'
-        precision = ''
+        precision = ""
         while format:
             if not format[0].isdigit():
                 break
@@ -340,13 +400,18 @@ def extract_format(format, extra_types):
 
     # the rest is the type, if present
     type = format
-    if type and type not in ALLOWED_TYPES and type not in extra_types:
-        raise ValueError('format spec %r not recognised' % type)
+    if (
+        type
+        and type not in ALLOWED_TYPES
+        and type not in extra_types
+        and not any(k in type for k in dt_format_to_regex)
+    ):
+        raise ValueError("format spec %r not recognised" % type)
 
     return locals()
 
 
-PARSE_RE = re.compile(r"""({{|}}|{\w*(?:(?:\.\w+)|(?:\[[^\]]+\]))*(?::[^}]+)?})""")
+PARSE_RE = re.compile(r"({{|}}|{[\w-]*(?:\.[\w-]+|\[[^]]+])*(?::[^}]+)?})")
 
 
 class Parser(object):
@@ -354,7 +419,7 @@ class Parser(object):
 
     def __init__(self, format, extra_types=None, case_sensitive=False):
         # a mapping of a name as in {hello.world} to a regex-group compatible
-        # name, like hello__world Its used to prevent the transformation of
+        # name, like hello__world. It's used to prevent the transformation of
         # name-to-group and group to name to fail subtly, such as in:
         # hello_.world-> hello___world->hello._world
         self._group_to_name_map = {}
@@ -381,12 +446,12 @@ class Parser(object):
         self.__search_re = None
         self.__match_re = None
 
-        log.debug('format %r -> %r', format, self._expression)
+        log.debug("format %r -> %r", format, self._expression)
 
     def __repr__(self):
         if len(self._format) > 20:
-            return '<%s %r>' % (self.__class__.__name__, self._format[:17] + '...')
-        return '<%s %r>' % (self.__class__.__name__, self._format)
+            return "<%s %r>" % (self.__class__.__name__, self._format[:17] + "...")
+        return "<%s %r>" % (self.__class__.__name__, self._format)
 
     @property
     def _search_re(self):
@@ -396,24 +461,24 @@ class Parser(object):
             except AssertionError:
                 # access error through sys to keep py3k and backward compat
                 e = str(sys.exc_info()[1])
-                if e.endswith('this version only supports 100 named groups'):
+                if e.endswith("this version only supports 100 named groups"):
                     raise TooManyFields(
-                        'sorry, you are attempting to parse ' 'too many complex fields'
+                        "sorry, you are attempting to parse too many complex fields"
                     )
         return self.__search_re
 
     @property
     def _match_re(self):
         if self.__match_re is None:
-            expression = r'\A%s\Z' % self._expression
+            expression = r"\A%s\Z" % self._expression
             try:
                 self.__match_re = re.compile(expression, self._re_flags)
             except AssertionError:
                 # access error through sys to keep py3k and backward compat
                 e = str(sys.exc_info()[1])
-                if e.endswith('this version only supports 100 named groups'):
+                if e.endswith("this version only supports 100 named groups"):
                     raise TooManyFields(
-                        'sorry, you are attempting to parse ' 'too many complex fields'
+                        "sorry, you are attempting to parse too many complex fields"
                     )
             except re.error:
                 raise NotImplementedError(
@@ -424,11 +489,15 @@ class Parser(object):
 
     @property
     def named_fields(self):
-        return self._named_fields.copy()
+        return self._named_fields[:]
 
     @property
     def fixed_fields(self):
-        return self._fixed_fields.copy()
+        return self._fixed_fields[:]
+
+    @property
+    def format(self):
+        return self._format
 
     def parse(self, string, evaluate_result=True):
         """Match my format to the string exactly.
@@ -489,14 +558,18 @@ class Parser(object):
         result = {}
         for field, value in named_fields.items():
             # split 'aaa[bbb][ccc]...' into 'aaa' and '[bbb][ccc]...'
-            basename, subkeys = re.match(r'([^\[]+)(.*)', field).groups()
+            n = field.find("[")
+            if n == -1:
+                basename, subkeys = field, ""
+            else:
+                basename, subkeys = field[:n], field[n:]
 
             # create nested dictionaries {'aaa': {'bbb': {'ccc': ...}}}
             d = result
             k = basename
 
             if subkeys:
-                for subkey in re.findall(r'\[[^\]]+\]', subkeys):
+                for subkey in re.findall(r"\[[^]]+]", subkeys):
                     d = d.setdefault(k, {})
                     k = subkey[1:-1]
 
@@ -506,7 +579,7 @@ class Parser(object):
         return result
 
     def evaluate_result(self, m):
-        '''Generate a Result instance for the given regex match object'''
+        """Generate a Result instance for the given regex match object"""
         # ok, figure the fixed fields we've pulled out and type convert them
         fixed_fields = list(m.groups())
         for n in self._fixed_fields:
@@ -529,14 +602,14 @@ class Parser(object):
             named_fields[korig] = value
 
         # now figure the match spans
-        spans = dict((n, m.span(name_map[n])) for n in named_fields)
+        spans = {n: m.span(name_map[n]) for n in named_fields}
         spans.update((i, m.span(n + 1)) for i, n in enumerate(self._fixed_fields))
 
         # and that's our result
         return Result(fixed_fields, self._expand_named_fields(named_fields), spans)
 
     def _regex_replace(self, match):
-        return '\\' + match.group(1)
+        return "\\" + match.group(1)
 
     def _generate_expression(self):
         # turn my _format attribute into the _expression attribute
@@ -544,33 +617,35 @@ class Parser(object):
         for part in PARSE_RE.split(self._format):
             if not part:
                 continue
-            elif part == '{{':
-                e.append(r'\{')
-            elif part == '}}':
-                e.append(r'\}')
-            elif part[0] == '{' and part[-1] == '}':
+            elif part == "{{":
+                e.append(r"\{")
+            elif part == "}}":
+                e.append(r"\}")
+            elif part[0] == "{" and part[-1] == "}":
                 # this will be a braces-delimited field to handle
                 e.append(self._handle_field(part))
             else:
                 # just some text to match
                 e.append(REGEX_SAFETY.sub(self._regex_replace, part))
-        return ''.join(e)
+        return "".join(e)
 
     def _to_group_name(self, field):
         # return a version of field which can be used as capture group, even
         # though it might contain '.'
-        group = field.replace('.', '_').replace('[', '_').replace(']', '_')
+        group = field.replace(".", "_").replace("[", "_").replace("]", "_").replace("-", "_")
 
         # make sure we don't collide ("a.b" colliding with "a_b")
         n = 1
         while group in self._group_to_name_map:
             n += 1
-            if '.' in field:
-                group = field.replace('.', '_' * n)
-            elif '_' in field:
-                group = field.replace('_', '_' * n)
+            if "." in field:
+                group = field.replace(".", "_" * n)
+            elif "_" in field:
+                group = field.replace("_", "_" * n)
+            elif "-" in field:
+                group = field.replace("-", "_" * n)
             else:
-                raise KeyError('duplicated group name %r' % (field,))
+                raise KeyError("duplicated group name %r" % (field,))
 
         # save off the mapping
         self._group_to_name_map[group] = field
@@ -583,10 +658,10 @@ class Parser(object):
 
         # now figure whether this is an anonymous or named field, and whether
         # there's any format specification
-        format = ''
+        format = ""
 
-        if ':' in field:
-            name, format = field.split(':')
+        if ":" in field:
+            name, format = field.split(":", 1)
         else:
             name = field
 
@@ -599,195 +674,171 @@ class Parser(object):
                 if self._name_types[name] != format:
                     raise RepeatedNameError(
                         'field type %r for field "%s" '
-                        'does not match previous seen type %r'
+                        "does not match previous seen type %r"
                         % (format, name, self._name_types[name])
                     )
                 group = self._name_to_group_map[name]
                 # match previously-seen value
-                return r'(?P=%s)' % group
+                return r"(?P=%s)" % group
             else:
                 group = self._to_group_name(name)
                 self._name_types[name] = format
             self._named_fields.append(group)
             # this will become a group, which must not contain dots
-            wrap = r'(?P<%s>%%s)' % group
+            wrap = r"(?P<%s>%%s)" % group
         else:
             self._fixed_fields.append(self._group_index)
-            wrap = r'(%s)'
+            wrap = r"(%s)"
             group = self._group_index
 
         # simplest case: no type specifier ({} or {name})
         if not format:
             self._group_index += 1
-            return wrap % r'.+?'
+            return wrap % r".+?"
 
         # decode the format specification
         format = extract_format(format, self._extra_types)
 
         # figure type conversions, if any
-        type = format['type']
-        is_numeric = type and type in 'n%fegdobx'
+        type = format["type"]
+        is_numeric = type and type in "n%fegdobx"
+        conv = self._type_conversions
         if type in self._extra_types:
             type_converter = self._extra_types[type]
-            s = getattr(type_converter, 'pattern', r'.+?')
-            regex_group_count = getattr(type_converter, 'regex_group_count', 0)
+            s = getattr(type_converter, "pattern", r".+?")
+            regex_group_count = getattr(type_converter, "regex_group_count", 0)
             if regex_group_count is None:
                 regex_group_count = 0
             self._group_index += regex_group_count
-            self._type_conversions[group] = convert_first(type_converter)
-        elif type == 'n':
-            s = r'\d{1,3}([,.]\d{3})*'
+            conv[group] = convert_first(type_converter)
+        elif type == "n":
+            s = r"\d{1,3}([,.]\d{3})*"
             self._group_index += 1
-            self._type_conversions[group] = int_convert(10)
-        elif type == 'b':
-            s = r'(0[bB])?[01]+'
-            self._type_conversions[group] = int_convert(2)
+            conv[group] = int_convert(10)
+        elif type == "b":
+            s = r"(0[bB])?[01]+"
+            conv[group] = int_convert(2)
             self._group_index += 1
-        elif type == 'o':
-            s = r'(0[oO])?[0-7]+'
-            self._type_conversions[group] = int_convert(8)
+        elif type == "o":
+            s = r"(0[oO])?[0-7]+"
+            conv[group] = int_convert(8)
             self._group_index += 1
-        elif type == 'x':
-            s = r'(0[xX])?[0-9a-fA-F]+'
-            self._type_conversions[group] = int_convert(16)
+        elif type == "x":
+            s = r"(0[xX])?[0-9a-fA-F]+"
+            conv[group] = int_convert(16)
             self._group_index += 1
-        elif type == '%':
-            s = r'\d+(\.\d+)?%'
+        elif type == "%":
+            s = r"\d+(\.\d+)?%"
             self._group_index += 1
-            self._type_conversions[group] = percentage
-        elif type == 'f':
-            s = r'\d*\.\d+'
-            self._type_conversions[group] = convert_first(float)
-        elif type == 'F':
-            s = r'\d*\.\d+'
-            self._type_conversions[group] = convert_first(Decimal)
-        elif type == 'e':
-            s = r'\d*\.\d+[eE][-+]?\d+|nan|NAN|[-+]?inf|[-+]?INF'
-            self._type_conversions[group] = convert_first(float)
-        elif type == 'g':
-            s = r'\d+(\.\d+)?([eE][-+]?\d+)?|nan|NAN|[-+]?inf|[-+]?INF'
+            conv[group] = percentage
+        elif type == "f":
+            s = r"\d*\.\d+"
+            conv[group] = convert_first(float)
+        elif type == "F":
+            s = r"\d*\.\d+"
+            conv[group] = convert_first(Decimal)
+        elif type == "e":
+            s = r"\d*\.\d+[eE][-+]?\d+|nan|NAN|[-+]?inf|[-+]?INF"
+            conv[group] = convert_first(float)
+        elif type == "g":
+            s = r"\d+(\.\d+)?([eE][-+]?\d+)?|nan|NAN|[-+]?inf|[-+]?INF"
             self._group_index += 2
-            self._type_conversions[group] = convert_first(float)
-        elif type == 'd':
-            if format.get('width'):
-                width = r'{1,%s}' % int(format['width'])
+            conv[group] = convert_first(float)
+        elif type == "d":
+            if format.get("width"):
+                width = r"{1,%s}" % int(format["width"])
             else:
-                width = '+'
-            s = r'\d{w}|[-+ ]?0[xX][0-9a-fA-F]{w}|[-+ ]?0[bB][01]{w}|[-+ ]?0[oO][0-7]{w}'.format(
+                width = "+"
+            s = r"\d{w}|[-+ ]?0[xX][0-9a-fA-F]{w}|[-+ ]?0[bB][01]{w}|[-+ ]?0[oO][0-7]{w}".format(
                 w=width
             )
-            self._type_conversions[
-                group
-            ] = int_convert()  # do not specify number base, determine it automatically
-        elif type == 'ti':
-            s = r'(\d{4}-\d\d-\d\d)((\s+|T)%s)?(Z|\s*[-+]\d\d:?\d\d)?' % TIME_PAT
+            conv[group] = int_convert()
+            # do not specify number base, determine it automatically
+        elif any(k in type for k in dt_format_to_regex):
+            s = get_regex_for_datetime_format(type)
+            conv[group] = partial(strf_date_convert, type=type)
+        elif type == "ti":
+            s = r"(\d{4}-\d\d-\d\d)((\s+|T)%s)?(Z|\s*[-+]\d\d:?\d\d)?" % TIME_PAT
             n = self._group_index
-            self._type_conversions[group] = partial(
-                date_convert, ymd=n + 1, hms=n + 4, tz=n + 7
-            )
+            conv[group] = partial(date_convert, ymd=n + 1, hms=n + 4, tz=n + 7)
             self._group_index += 7
-        elif type == 'tg':
-            s = r'(\d{1,2}[-/](\d{1,2}|%s)[-/]\d{4})(\s+%s)?%s?%s?' % (
-                ALL_MONTHS_PAT,
-                TIME_PAT,
-                AM_PAT,
-                TZ_PAT,
-            )
+        elif type == "tg":
+            s = r"(\d{1,2}[-/](\d{1,2}|%s)[-/]\d{4})(\s+%s)?%s?%s?"
+            s %= (ALL_MONTHS_PAT, TIME_PAT, AM_PAT, TZ_PAT)
             n = self._group_index
-            self._type_conversions[group] = partial(
+            conv[group] = partial(
                 date_convert, dmy=n + 1, hms=n + 5, am=n + 8, tz=n + 9
             )
             self._group_index += 9
-        elif type == 'ta':
-            s = r'((\d{1,2}|%s)[-/]\d{1,2}[-/]\d{4})(\s+%s)?%s?%s?' % (
-                ALL_MONTHS_PAT,
-                TIME_PAT,
-                AM_PAT,
-                TZ_PAT,
-            )
+        elif type == "ta":
+            s = r"((\d{1,2}|%s)[-/]\d{1,2}[-/]\d{4})(\s+%s)?%s?%s?"
+            s %= (ALL_MONTHS_PAT, TIME_PAT, AM_PAT, TZ_PAT)
             n = self._group_index
-            self._type_conversions[group] = partial(
+            conv[group] = partial(
                 date_convert, mdy=n + 1, hms=n + 5, am=n + 8, tz=n + 9
             )
             self._group_index += 9
-        elif type == 'te':
+        elif type == "te":
             # this will allow microseconds through if they're present, but meh
-            s = r'(%s,\s+)?(\d{1,2}\s+%s\s+\d{4})\s+%s%s' % (
-                DAYS_PAT,
-                MONTHS_PAT,
-                TIME_PAT,
-                TZ_PAT,
-            )
+            s = r"(%s,\s+)?(\d{1,2}\s+%s\s+\d{4})\s+%s%s"
+            s %= (DAYS_PAT, MONTHS_PAT, TIME_PAT, TZ_PAT)
             n = self._group_index
-            self._type_conversions[group] = partial(
-                date_convert, dmy=n + 3, hms=n + 5, tz=n + 8
-            )
+            conv[group] = partial(date_convert, dmy=n + 3, hms=n + 5, tz=n + 8)
             self._group_index += 8
-        elif type == 'th':
+        elif type == "th":
             # slight flexibility here from the stock Apache format
-            s = r'(\d{1,2}[-/]%s[-/]\d{4}):%s%s' % (MONTHS_PAT, TIME_PAT, TZ_PAT)
+            s = r"(\d{1,2}[-/]%s[-/]\d{4}):%s%s" % (MONTHS_PAT, TIME_PAT, TZ_PAT)
             n = self._group_index
-            self._type_conversions[group] = partial(
-                date_convert, dmy=n + 1, hms=n + 3, tz=n + 6
-            )
+            conv[group] = partial(date_convert, dmy=n + 1, hms=n + 3, tz=n + 6)
             self._group_index += 6
-        elif type == 'tc':
-            s = r'(%s)\s+%s\s+(\d{1,2})\s+%s\s+(\d{4})' % (
-                DAYS_PAT,
-                MONTHS_PAT,
-                TIME_PAT,
-            )
+        elif type == "tc":
+            s = r"(%s)\s+%s\s+(\d{1,2})\s+%s\s+(\d{4})"
+            s %= (DAYS_PAT, MONTHS_PAT, TIME_PAT)
             n = self._group_index
-            self._type_conversions[group] = partial(
-                date_convert, d_m_y=(n + 4, n + 3, n + 8), hms=n + 5
-            )
+            conv[group] = partial(date_convert, d_m_y=(n + 4, n + 3, n + 8), hms=n + 5)
             self._group_index += 8
-        elif type == 'tt':
-            s = r'%s?%s?%s?' % (TIME_PAT, AM_PAT, TZ_PAT)
+        elif type == "tt":
+            s = r"%s?%s?%s?" % (TIME_PAT, AM_PAT, TZ_PAT)
             n = self._group_index
-            self._type_conversions[group] = partial(
-                date_convert, hms=n + 1, am=n + 4, tz=n + 5
-            )
+            conv[group] = partial(date_convert, hms=n + 1, am=n + 4, tz=n + 5)
             self._group_index += 5
-        elif type == 'ts':
-            s = r'%s(\s+)(\d+)(\s+)(\d{1,2}:\d{1,2}:\d{1,2})?' % MONTHS_PAT
+        elif type == "ts":
+            s = r"%s(\s+)(\d+)(\s+)(\d{1,2}:\d{1,2}:\d{1,2})?" % MONTHS_PAT
             n = self._group_index
-            self._type_conversions[group] = partial(
-                date_convert, mm=n + 1, dd=n + 3, hms=n + 5
-            )
+            conv[group] = partial(date_convert, mm=n + 1, dd=n + 3, hms=n + 5)
             self._group_index += 5
-        elif type == 'l':
-            s = r'[A-Za-z]+'
+        elif type == "l":
+            s = r"[A-Za-z]+"
         elif type:
-            s = r'\%s+' % type
-        elif format.get('precision'):
-            if format.get('width'):
-                s = r'.{%s,%s}?' % (format['width'], format['precision'])
+            s = r"\%s+" % type
+        elif format.get("precision"):
+            if format.get("width"):
+                s = r".{%s,%s}?" % (format["width"], format["precision"])
             else:
-                s = r'.{1,%s}?' % format['precision']
-        elif format.get('width'):
-            s = r'.{%s,}?' % format['width']
+                s = r".{1,%s}?" % format["precision"]
+        elif format.get("width"):
+            s = r".{%s,}?" % format["width"]
         else:
-            s = r'.+?'
+            s = r".+?"
 
-        align = format['align']
-        fill = format['fill']
+        align = format["align"]
+        fill = format["fill"]
 
         # handle some numeric-specific things like fill and sign
         if is_numeric:
             # prefix with something (align "=" trumps zero)
-            if align == '=':
+            if align == "=":
                 # special case - align "=" acts like the zero above but with
                 # configurable fill defaulting to "0"
                 if not fill:
-                    fill = '0'
-                s = r'%s*' % fill + s
+                    fill = "0"
+                s = r"%s*" % fill + s
 
             # allow numbers to be prefixed with a sign
-            s = r'[-+ ]?' + s
+            s = r"[-+ ]?" + s
 
         if not fill:
-            fill = ' '
+            fill = " "
 
         # Place into a group now - this captures the value we want to keep.
         # Everything else from now is just padding to be stripped off
@@ -795,24 +846,24 @@ class Parser(object):
             s = wrap % s
             self._group_index += 1
 
-        if format['width']:
+        if format["width"]:
             # all we really care about is that if the format originally
             # specified a width then there will probably be padding - without
             # an explicit alignment that'll mean right alignment with spaces
             # padding
             if not align:
-                align = '>'
+                align = ">"
 
-        if fill in r'.\+?*[](){}^$':
-            fill = '\\' + fill
+        if fill in r".\+?*[](){}^$":
+            fill = "\\" + fill
 
         # align "=" has been handled
-        if align == '<':
-            s = '%s%s*' % (s, fill)
-        elif align == '>':
-            s = '%s*%s' % (fill, s)
-        elif align == '^':
-            s = '%s*%s%s*' % (fill, s, fill)
+        if align == "<":
+            s = "%s%s*" % (s, fill)
+        elif align == ">":
+            s = "%s*%s" % (fill, s)
+        elif align == "^":
+            s = "%s*%s%s*" % (fill, s, fill)
 
         return s
 
@@ -839,7 +890,7 @@ class Result(object):
         return self.named[item]
 
     def __repr__(self):
-        return '<%s %r %r>' % (self.__class__.__name__, self.fixed, self.named)
+        return "<%s %r %r>" % (self.__class__.__name__, self.fixed, self.named)
 
     def __contains__(self, name):
         return name in self.named
@@ -857,7 +908,7 @@ class Match(object):
         self.match = match
 
     def evaluate_result(self):
-        '''Generate results for this Match'''
+        """Generate results for this Match"""
         return self.parser.evaluate_result(self.match)
 
 
