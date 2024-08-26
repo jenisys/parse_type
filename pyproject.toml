@@ -61,6 +61,7 @@ Download = "https://pypi.org/project/parse_type/"
 
 [project.optional-dependencies]
 develop = [
+    "setuptools",
     "build >= 0.5.1",
     "twine >= 1.13.0",
     "coverage >= 4.4",

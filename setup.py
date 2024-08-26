@@ -53,7 +53,7 @@ def find_packages_by_root_package(where):
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = "0.6.2",
+    version = "0.6.3",
     author = "Jens Engel",
     author_email = "jenisys@noreply.github.com",
     url = "https://github.com/jenisys/parse_type",
@@ -79,11 +79,12 @@ setup(
         "pytest-html >= 1.19.0",
     ],
     extras_require={
-        'docs': [
+        "docs": [
             "Sphinx >=1.6",
             "sphinx_bootstrap_theme >= 0.6.0"
         ],
-        'develop': [
+        "develop": [
+            "setuptools",
             "build >= 0.5.1",
             "twine >= 1.13.0",
             "coverage >= 4.4",

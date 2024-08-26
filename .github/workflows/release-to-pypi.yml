@@ -45,7 +45,7 @@ jobs:
       - name: Build this package
         run: python -m build
       - name: Check this package (before upload)
-        run: twine check dist/*                                                                                                                   ─╯
+        run: twine check dist/*
       - name: Upload this package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

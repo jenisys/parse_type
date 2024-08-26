@@ -11,4 +11,4 @@ from parse_type.cardinality import Cardinality
 from parse_type.builder import TypeBuilder, build_type_dict
 
 __all__ = ["Cardinality", "TypeBuilder", "build_type_dict"]
-__version__ = "0.6.2"
+__version__ = "0.6.3"
