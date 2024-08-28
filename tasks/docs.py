@@ -3,7 +3,6 @@
 Provides tasks to build documentation with sphinx, etc.
 """
 
-from __future__ import absolute_import, print_function
 import os
 import sys
 from invoke import task, Collection

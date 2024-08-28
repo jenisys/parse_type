@@ -4,7 +4,6 @@
 Test suite to test the :mod:`parse_type.parse_util` module.
 """
 
-from __future__ import absolute_import, print_function
 from .parse_type_test import TestCase, unittest
 from parse_type.parse_util \
     import Field, FieldParser, FormatSpec, make_format_spec

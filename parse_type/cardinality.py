@@ -4,8 +4,6 @@ This module simplifies to build parse types and regular expressions
 for a data type with the specified cardinality.
 """
 
-# -- USE: enum34
-from __future__ import absolute_import
 from enum import Enum
 
 
@@ -84,7 +82,7 @@ class Cardinality(Enum):
 # -----------------------------------------------------------------------------
 # CLASS: TypeBuilder
 # -----------------------------------------------------------------------------
-class TypeBuilder(object):
+class TypeBuilder:
     """Provides a utility class to build type-converters (parse_types) for parse.
     It supports to build new type-converters for different cardinality
     based on the type-converter for cardinality one.

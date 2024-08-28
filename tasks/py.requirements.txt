@@ -11,7 +11,6 @@
 invoke >=1.7.0,<2.0; python_version <  '3.6'
 invoke >=1.7.0;      python_version >= '3.6'
 pycmd
-six >= 1.15.0
 
 # -- HINT, was RENAMED: path.py => path (for python3)
 path    >= 13.1.0; python_version >= '3.5'

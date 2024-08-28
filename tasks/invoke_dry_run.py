@@ -15,7 +15,6 @@ Basic support to use a --dry-run mode w/ invoke tasks.
         ctx.run("rm -rf {}".format(path))
 """
 
-from __future__ import print_function
 from contextlib import contextmanager
 
 @contextmanager
@@ -36,7 +35,7 @@ def dry_run_mode(ctx):
     ctx.config.run.dry = initial_dry_run
 
 
-class DryRunContext(object):
+class DryRunContext:
     PREFIX = "DRY-RUN: "
     SCHEMA = "{prefix}{command}"
     SCHEMA_WITH_KWARGS = "{prefix}{command} (with kwargs={kwargs})"

@@ -1,6 +1,5 @@
 # coding: utf-8
 # -- REPLACE: parse with parse_type.parse
-from __future__ import absolute_import, print_function
 from parse_type import parse
 
 # -- ORIGINAL_SOURCE_STARTS_HERE:

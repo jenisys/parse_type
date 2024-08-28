@@ -6,7 +6,6 @@ Test suite  for parse_type.py
 REQUIRES: parse >= 1.8.4 ('pattern' attribute support)
 """
 
-from __future__ import absolute_import
 import re
 import unittest
 import parse

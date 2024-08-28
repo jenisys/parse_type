@@ -8,7 +8,4 @@
 #  * http://www.pip-installer.org/
 # ============================================================================
 
-parse >= 1.18.0; python_version >= '3.0'
-parse >= 1.13.1; python_version <= '2.7'
-enum34; python_version < '3.4'
-six >= 1.15
+parse >= 1.18.0

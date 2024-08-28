@@ -7,7 +7,6 @@ COMMANDS:
 
   * copytree
   * copy
-  * py2to3
 
 REQUIRES:
   * argparse
@@ -181,7 +180,7 @@ def discover_commands():
     return commands
 
 
-class Command(object):
+class Command:
     def __init__(self, name, func):
         assert isinstance(name, basestring)
         assert callable(func)
