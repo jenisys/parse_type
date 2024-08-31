@@ -22,6 +22,7 @@ REQUIRES:
 
 * pip install check-jsonschema
 * pip install typer >= 0.12.5
+* pip install typing-extensions
 
 GITHUB WORKFLOW SCHEMA:
 

@@ -16,6 +16,10 @@ wheel
 # -- PYTHON2/PYTHON3 COMPATIBILITY:
 modernize >= 0.5
 
+# -- PYTHON 3 TYPE HINTS:
+typing-extensions; python_version >= '3.8'
+typer >= 0.12.5;   python_version >= '3.7'
+
 # -- LINTERS:
 ruff; python_version >=  '3.7'
 pylint
