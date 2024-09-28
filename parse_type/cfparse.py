@@ -4,7 +4,6 @@ Provides an extended :class:`parse.Parser` class that supports the
 cardinality fields in (user-defined) types.
 """
 
-from __future__ import absolute_import
 import logging
 import parse
 from .cardinality_field import CardinalityField, CardinalityFieldTypeBuilder

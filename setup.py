@@ -66,12 +66,9 @@ setup(
     include_package_data = True,
 
     # -- REQUIREMENTS:
-    python_requires=">=2.7, !=3.0.*, !=3.1.*",
+    python_requires=">=3.2",
     install_requires=[
-        "parse >= 1.18.0; python_version >= '3.0'",
-        "parse >= 1.13.1; python_version <= '2.7'",
-        "enum34; python_version < '3.4'",
-        "six >= 1.15",
+        "parse >= 1.18.0",
     ],
     tests_require=[
         "pytest <  5.0; python_version <  '3.0'", # >= 4.2
@@ -88,8 +85,7 @@ setup(
             "build >= 0.5.1",
             "twine >= 1.13.0",
             "coverage >= 4.4",
-            "pytest <  5.0; python_version <  '3.0'",  # >= 4.2
-            "pytest >= 5.0; python_version >= '3.0'",
+            "pytest >= 5.0",
             "pytest-html >= 1.19.0",
             "pytest-cov",
             "tox >=2.8,<4.0",

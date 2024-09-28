@@ -61,7 +61,6 @@ A Choice data type allows to select one of several strings.
 
 """
 
-from __future__ import absolute_import
 import inspect
 import re
 import enum

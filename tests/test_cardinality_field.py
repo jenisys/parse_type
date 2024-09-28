@@ -16,7 +16,6 @@ STATUS:
     IDEA, working prototype with patched parse module, but not accepted.
 """
 
-from __future__ import absolute_import
 from .parse_type_test \
     import TestCase, parse_number, unittest
 from .test_cardinality import CardinalityTypeBuilderTest

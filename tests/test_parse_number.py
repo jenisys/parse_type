@@ -4,7 +4,6 @@ Additional unit tests for the :mod`parse` module.
 Related to auto-detection of number base (base=10, 2, 8, 16).
 """
 
-from __future__ import absolute_import, print_function
 import pytest
 import parse
 

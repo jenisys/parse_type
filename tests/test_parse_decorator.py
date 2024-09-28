@@ -5,7 +5,6 @@
 Integrated into :mod:`parse` module.
 """
 
-from __future__ import absolute_import
 import unittest
 import parse
 from parse_type import build_type_dict
@@ -54,7 +53,7 @@ class TestParseTypeWithPatternDecorator(ParseTypeTestCase):
 
     def test_classmethod_with_pattern_decorator(self):
         choice_pattern = r"Alice|Bob|Charly"
-        class C(object):
+        class C:
             @classmethod
             @parse.with_pattern(choice_pattern)
             def parse_choice(cls, text):
@@ -65,7 +64,7 @@ class TestParseTypeWithPatternDecorator(ParseTypeTestCase):
 
     def test_staticmethod_with_pattern_decorator(self):
         choice_pattern = r"Alice|Bob|Charly"
-        class S(object):
+        class S:
             @staticmethod
             @parse.with_pattern(choice_pattern)
             def parse_choice(text):
@@ -98,7 +97,7 @@ class TestParseTypeWithPatternDecorator(ParseTypeTestCase):
 
     def test_decorated_classmethod_with_parser(self):
         # -- SETUP:
-        class C(object):
+        class C:
             @classmethod
             @parse.with_pattern(r"Alice|Bob|Charly")
             def parse_person(cls, text):

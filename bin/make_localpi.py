@@ -38,7 +38,6 @@ ALTERNATIVE:
     pip install --find-links=/tmp/downloads --no-index argparse Jinja2
 """
 
-from __future__ import with_statement, print_function
 from fnmatch import fnmatch
 import os.path
 import shutil
@@ -51,7 +50,7 @@ __license__ = "BSD"
 __copyright__ = "(c) 2013 by Jens Engel"
 
 
-class Package(object):
+class Package:
     """
     Package entity that keeps track of:
       * one or more versions of this package

@@ -16,7 +16,6 @@ STATUS:
     IDEA, working prototype with patched parse module, but not accepted.
 """
 
-from __future__ import absolute_import
 from .parse_type_test import ParseTypeTestCase
 from parse_type import TypeBuilder, build_type_dict
 import parse

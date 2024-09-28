@@ -8,8 +8,6 @@ A cardinality field is a type suffix for parse format expression, ala:
     "{persons:Person+}"  #< Cardinality: 1..* = one  or more = many
 """
 
-from __future__ import absolute_import
-import six
 from parse_type.cardinality import Cardinality, TypeBuilder
 
 
@@ -19,7 +17,7 @@ class MissingTypeError(KeyError):   # pylint: disable=missing-docstring
 # -----------------------------------------------------------------------------
 # CLASS: Cardinality (Field Part)
 # -----------------------------------------------------------------------------
-class CardinalityField(object):
+class CardinalityField:
     """Cardinality field for parse format expression, ala:
 
         "{person:Person?}"   #< Cardinality: 0..1 = zero or one  = optional
@@ -81,7 +79,7 @@ class CardinalityField(object):
 # -----------------------------------------------------------------------------
 # CLASS: CardinalityFieldTypeBuilder
 # -----------------------------------------------------------------------------
-class CardinalityFieldTypeBuilder(object):
+class CardinalityFieldTypeBuilder:
     """Utility class to create type converters based on:
 
       * the CardinalityField naming scheme and
@@ -115,7 +113,7 @@ class CardinalityFieldTypeBuilder(object):
         :raises: ValueError, if type_name does not end with CardinalityField
         :raises: MissingTypeError, if type_converter is missing in type_dict
         """
-        assert isinstance(type_name, six.string_types)
+        assert isinstance(type_name, str)
         if not CardinalityField.matches_type(type_name):
             message = "type_name='%s' has no CardinalityField" % type_name
             raise ValueError(message)

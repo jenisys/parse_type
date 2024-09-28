@@ -4,10 +4,8 @@
 Provides generic utility classes for the :class:`parse.Parser` class.
 """
 
-from __future__ import absolute_import
 from collections import namedtuple
 import parse
-import six
 
 
 # -- HELPER-CLASS: For format part in a Field.
@@ -21,7 +19,7 @@ def make_format_spec(type=None, width="", zero=False, align=None, fill=None,
     return FormatSpec(type, width, zero, align, fill, precision)
 # pylint: enable=redefined-builtin
 
-class Field(object):
+class Field:
     """
     Provides a ValueObject for a Field in a parse expression.
 
@@ -66,7 +64,7 @@ class Field(object):
             format1 = self.format or ""
             format2 = other.format or ""
             return (self.name == other.name) and (format1 == format2)
-        elif isinstance(other, six.string_types):
+        elif isinstance(other, str):
             return str(self) == other
         else:
             raise ValueError(other)
@@ -150,7 +148,7 @@ class Field(object):
         return FormatSpec(type, width, zero, align, fill, precision)
 
 
-class FieldParser(object):
+class FieldParser:
     """
     Utility class that parses/extracts fields in parse expressions.
     """

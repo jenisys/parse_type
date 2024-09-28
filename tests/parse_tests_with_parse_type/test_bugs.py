@@ -1,5 +1,4 @@
 # -- REPLACE: parse with parse_type.parse
-from __future__ import absolute_import, print_function
 from parse_type import parse
 
 
