@@ -4,8 +4,6 @@
 Setup script for "parse_type" package.
 
 USAGE:
-    python setup.py install
-    # OR:
     pip install .
 
 SEE ALSO:
@@ -16,6 +14,7 @@ SEE ALSO:
 RELATED:
 
 * https://setuptools.readthedocs.io/en/latest/history.html
+* https://setuptools-scm.readthedocs.io/en/latest/usage/
 """
 
 import sys
@@ -24,6 +23,8 @@ sys.path.insert(0, os.curdir)
 
 # -- USE: setuptools
 from setuptools import setup, find_packages
+# DISABLED: from setuptools_scm import ScmVersion
+
 
 
 # -----------------------------------------------------------------------------
@@ -48,12 +49,23 @@ def find_packages_by_root_package(where):
     return packages
 
 
+# -- SEE: https://setuptools-scm.readthedocs.io/en/latest/customizing/
+# HINT: get_version_func(version: ScmVersion) -> str:
+def get_this_package_version(version):
+    from setuptools_scm.version import guess_next_version
+    if version.distance is None:
+        # -- FIX: Python 2.7 problem w/ setuptools-scm v5.0.2
+        version.distance = 0
+    return version.format_next_version(guess_next_version, "{guessed}b{distance}")
+
+
 # -----------------------------------------------------------------------------
 # SETUP:
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    version = "0.6.3",
+    # DISABLED: version = "0.6.3",
+    use_scm_version={"version_scheme": get_this_package_version},
     author = "Jens Engel",
     author_email = "jenisys@noreply.github.com",
     url = "https://github.com/jenisys/parse_type",
@@ -67,6 +79,16 @@ setup(
 
     # -- REQUIREMENTS:
     python_requires=">=2.7, !=3.0.*, !=3.1.*",
+    setup_requires=[
+        # -- DISABLED:
+        # "setuptools >= 64.0.0; python_version >= '3.5'",
+        # "setuptools <  45.0.0; python_version <  '3.5'",  # DROP: Python2, Python 3.4 support.
+        # "setuptools_scm >= 8.0.0; python_version >= '3.7'",
+        # "setuptools_scm <  8.0.0; python_version <  '3.7'",
+        "setuptools",
+        "setuptools-scm",
+        "wheel",
+    ],
     install_requires=[
         "parse >= 1.18.0; python_version >= '3.0'",
         "parse >= 1.13.1; python_version <= '2.7'",
@@ -84,7 +106,6 @@ setup(
             "sphinx_bootstrap_theme >= 0.6.0"
         ],
         "develop": [
-            "setuptools",
             "build >= 0.5.1",
             "twine >= 1.13.0",
             "coverage >= 4.4",

@@ -66,7 +66,7 @@ def checklist(ctx=None):    # pylint: disable=unused-argument
 [ ]  All tests pass w/ tox
 
 RELEASE CHECKLIST:
-[{x1}]  Bump version to new-version and tag repository (via bump_version)
+[{x1}]  Bump version to new-version by adding tag to the repository
 [{x2}]  Build packages (sdist, bdist_wheel via prepare)
 [{x3}]  Register and upload packages to testpypi repository (first)
 [{x4}]    Verify release is OK and packages from testpypi are usable
@@ -74,7 +74,7 @@ RELEASE CHECKLIST:
 [{x6}]  Push last changes to Github repository
 
 POST-RELEASE CHECKLIST:
-[ ]  Bump version to new-develop-version (via bump_version)
+[ ]  Bump version to new-develop-version by adding tag to the repository
 [ ]  Adapt CHANGES (if necessary)
 [ ]  Commit latest changes to Github repository
 """
@@ -86,29 +86,29 @@ POST-RELEASE CHECKLIST:
 
 
 @task(name="bump_version")
-def bump_version(ctx, new_version, version_part=None, dry_run=False):
+def bump_version(ctx, new_version, dry_run=False):
     """Bump version (to prepare a new release)."""
-    version_part = version_part or "minor"
+    if not new_version.startswith("v"):
+        new_version = "v{version}".format(version=new_version)
+
     if dry_run:
         ctx = DryRunContext(ctx)
-    ctx.run("bumpversion --new-version={} {}".format(new_version,
-                                                     version_part))
+    ctx.run("git tag {version}".format(version=new_version))
 
 
 @task(name="build", aliases=["build_packages"])
 def build_packages(ctx, hide=False):
     """Build packages for this release."""
     print("build_packages:")
-    ctx.run("python setup.py sdist bdist_wheel", echo=True, hide=hide)
+    ctx.run("python -m build", echo=True, hide=hide)
 
 
 @task
-def prepare(ctx, new_version=None, version_part=None, hide=True,
+def prepare(ctx, new_version=None, hide=True,
             dry_run=False):
     """Prepare the release: bump version, build packages, ..."""
     if new_version is not None:
-        bump_version(ctx, new_version, version_part=version_part,
-                     dry_run=dry_run)
+        bump_version(ctx, new_version, dry_run=dry_run)
     build_packages(ctx, hide=hide)
     packages = ensure_packages_exist(ctx, check_only=True)
     print_packages(packages)

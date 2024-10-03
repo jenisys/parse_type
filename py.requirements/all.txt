@@ -9,5 +9,6 @@
 # ============================================================================
 
 -r basic.txt
+-r packaging.txt
 -r develop.txt
 -r testing.txt

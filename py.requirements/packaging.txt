@@ -1,0 +1,21 @@
+# ============================================================================
+# PYTHON PACKAGE REQUIREMENTS: packaging support
+# ============================================================================
+# DESCRIPTION:
+#    pip install -r <THIS_FILE>
+#
+# SEE ALSO:
+#  * http://www.pip-installer.org/
+# ============================================================================
+
+# -- PACKAGING SUPPORT:
+build >= 0.5.1
+setuptools
+setuptools-scm
+wheel
+
+# -- DISABLED:
+# setuptools >= 64.0.0; python_version >= '3.5'
+# setuptools <  45.0.0; python_version <  '3.5'  # DROP: Python2, Python 3.4 support.
+# setuptools_scm >= 8.0.0; python_version >= '3.7'
+# setuptools_scm <  8.0.0; python_version <  '3.7'

@@ -1,0 +1,33 @@
+# ===========================================================================
+# vcs: Multi-repo configuration
+# ===========================================================================
+# USAGE:
+#   vcs --commands    # Show available commands
+#
+#   vcs import < .repos
+#   vcs import --input=.repos
+#   vcs import --input=https://github.com/jenisys/cxx.simplelog/blob/master/.repos
+#   vcs import --input=https://github.com/jenisys/cxx.simplelog/blob/master/.rosinstall
+#   vcs import --shallow --input=.repos
+#   vcs import lib/ --input=.repos
+#
+#   vcs pull
+#   vcs status
+#
+#   vcs export --nested                     # Use branch-name
+#   vcs export --nested --exact             # Use commit-hashes instead of branch-name
+#   vcs export --nested --exact-with-tags   # Use tags or commit-hashes
+#   vcs export --nested lib/doctest         # For a specific path instead of ".".
+#
+# BAD: vcs-export adds basename of current-directory to repositories.
+#
+# SEE ALSO:
+#   * https://github.com/dirk-thomas/vcstool
+# ===========================================================================
+# REQUIRES: pip install vcstool
+
+repositories:
+  lib/parse:
+    type: git
+    url: https://github.com/r1chardj0n3s/parse.git
+    version: master

@@ -5,13 +5,9 @@
 # -- BUILD-SYSTEM SUPPORT: Using invoke
 -r ../tasks/py.requirements.txt
 
-# -- PROJECT ADMIN SUPPORT:
-bump2version >= 0.5.6
-
 # -- RELEASE MANAGEMENT: Push package to pypi.
-build >= 0.5.1
 twine >= 1.13.0
-wheel
+-r packaging.txt
 
 # -- PYTHON2/PYTHON3 COMPATIBILITY:
 modernize >= 0.5
@@ -19,6 +15,9 @@ modernize >= 0.5
 # -- PYTHON 3 TYPE HINTS:
 typing-extensions; python_version >= '3.8'
 typer >= 0.12.5;   python_version >= '3.7'
+
+# -- MULTI-REPO TOOL:
+vcstool >= 0.3.0
 
 # -- LINTERS:
 ruff; python_version >=  '3.7'

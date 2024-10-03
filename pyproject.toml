@@ -1,11 +1,14 @@
 # =============================================================================
 # PACKAGING: parse_type
 # =============================================================================
-# SEE: https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
-# SEE: https://pypi.org/classifiers/
-# MAYBE: requires = ["setuptools", "setuptools-scm"]
+# SEE ALSO:
+#   * https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+#   * https://setuptools-scm.readthedocs.io/en/latest/usage/
+#   * https://pypi.org/classifiers/
+# =============================================================================
+# PYTHON3: requires = ["setuptools>=64", "setuptools_scm>=8", "wheel"]
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "setuptools_scm", "wheel"]
 build-backend = "setuptools.build_meta"
 
 
@@ -15,6 +18,7 @@ authors = [
     {name = "Jens Engel", email = "jenisys@noreply.github.com"},
 ]
 description = "Simplifies to build parse types based on the parse module"
+dynamic = ["version"]
 readme = "README.rst"
 requires-python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 keywords = ["parse", "parsing"]
@@ -48,8 +52,6 @@ dependencies = [
     "enum34; python_version < '3.4'",
     "six >= 1.15",
 ]
-# PREPARED:
-dynamic = ["version"]
 
 
 [project.urls]
@@ -61,7 +63,14 @@ Download = "https://pypi.org/project/parse_type/"
 
 [project.optional-dependencies]
 develop = [
+    # -- DISABLED:
+    # "setuptools >= 64.0.0; python_version >= '3.5'",
+    # "setuptools <  45.0.0; python_version <  '3.5'",  # DROP: Python2, Python 3.4 support.
+    # "setuptools_scm >= 8.0.0; python_version >= '3.7'",
+    # "setuptools_scm <  8.0.0; python_version <  '3.7'",
     "setuptools",
+    "setuptools-scm",
+    "wheel",
     "build >= 0.5.1",
     "twine >= 1.13.0",
     "coverage >= 4.4",
@@ -97,15 +106,19 @@ universal = true
 platforms = ["any"]
 zip-safe = true
 
-# -- PREPARED:
-[tool.setuptools.dynamic]
-version = {attr = "parse_type.__version__"}
+# -- DISABLED:
+# [tool.setuptools.dynamic]
+# version = {attr = "parse_type._version.version"}
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["parse_type*"]
 exclude = ["tests*"]
 namespaces = false
+
+# -- SETUPTOOLS-SCM: Generate version info from git-tag(s).
+[tool.setuptools_scm]
+version_file = "parse_type/_version.py"
 
 
 # =============================================================================

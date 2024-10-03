@@ -1,6 +1,7 @@
 *.py[cod]
 
 # -- TEMPORARY PYTHON PACKAGE PARTS:
+parse_type/_version.py
 MANIFEST
 *.egg
 *.egg-info
