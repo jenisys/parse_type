@@ -65,8 +65,8 @@ def get_this_package_version(version):
 # -----------------------------------------------------------------------------
 setup(
     name = "parse_type",
-    # DISABLED: version = "0.6.3",
-    use_scm_version={"version_scheme": get_this_package_version},
+    version = "0.6.6",
+    # DISABLED: use_scm_version={"version_scheme": get_this_package_version},
     author = "Jens Engel",
     author_email = "jenisys@noreply.github.com",
     url = "https://github.com/jenisys/parse_type",
