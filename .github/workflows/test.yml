@@ -25,7 +25,7 @@ jobs:
           - os: windows-latest
             python-version: "2.7"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # DISABLED: name: Setup Python ${{ matrix.python-version }} on platform=${{ matrix.os }}
       - uses: actions/setup-python@v5
         with:
@@ -48,7 +48,7 @@ jobs:
       - name: Run tests
         run: pytest
       - name: Upload test reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test reports
           path: |
