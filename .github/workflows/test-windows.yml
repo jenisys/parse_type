@@ -2,7 +2,7 @@
 # SEE: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 # SUPPORTED PYTHON VERSIONS: https://github.com/actions/python-versions
 
-name: test
+name: test-windows
 on:
   workflow_dispatch:
   push:
@@ -11,9 +11,11 @@ on:
     types: [opened, reopened, review_requested]
     branches: [ "main" ]
 
+env:
+  PYTHONUTF8: 1
+
 jobs:
   test:
-    # -- EXAMPLE: runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -30,7 +32,7 @@ jobs:
         #  - os: windows-latest
         #    python-version: "2.7"
     # DISABLED: runs-on: ${{ matrix.os }}
-    runs-on: "ubuntu-latest"
+    runs-on: "windows-latest"
     continue-on-error: ${{ matrix.experimental }}
     steps:
       - uses: actions/checkout@v5

@@ -1,4 +1,15 @@
+#!/usr/bin/env -S uv run --script
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "check-jsonschema",
+#   "typer >= 0.12.5",
+#   "typing-extensions",
+# ]
+# ///
+# SEE: https://peps.python.org/pep-0723/
+# SEE: https://docs.astral.sh/uv/guides/scripts/#using-a-shebang-to-create-an-executable-file
 """
 Check a github-workflow YAML file.
 
@@ -13,7 +24,8 @@ RELATED: JSON schema for Github Action workflows
     REQUIRES:
         pip install check-jsonschema
         DOWNLOAD: https://github.com/SchemaStore/schemastore/blob/master/src/schemas/json/github-workflow.json
-    USE: check-jsonschema --schemafile github-workflow.json_schema.txt .github/workflows/release-to-pypi.yml
+    USE: check-jsonschema --schemafile github-workflow.json_schema.txt
+                          .github/workflows/release-to-pypi.yml
 
 * https://github.com/SchemaStore/schemastore/blob/master/src/schemas/json/github-action.json
 * MAYBE: https://github.com/softprops/github-actions-schemas/blob/master/workflow.json
@@ -41,7 +53,7 @@ import typer
 # -----------------------------------------------------------------------------
 HERE = Path(__file__).parent.absolute()
 GITHUB_WORKFLOW_SCHEMA_URL = "https://github.com/SchemaStore/schemastore/blob/master/src/schemas/json/github-workflow.json"
-GITHUB_WORKFLOW_SCHEMA_PATH = HERE/"github-workflow.json_schema"
+GITHUB_WORKFLOW_SCHEMA_PATH = HERE/"github-workflow.schema.json"
 
 
 # -----------------------------------------------------------------------------
