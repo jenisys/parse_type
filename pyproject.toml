@@ -1,6 +1,7 @@
 # =============================================================================
 # PACKAGING: parse_type
 # =============================================================================
+# SPDX-License-Identifier: MIT
 # SEE ALSO:
 #   * https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 #   * https://setuptools-scm.readthedocs.io/en/latest/usage/
@@ -22,13 +23,13 @@ dynamic = ["version"]
 readme = "README.rst"
 requires-python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 keywords = ["parse", "parsing"]
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3.2",
@@ -57,8 +58,8 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/jenisys/parse_type"
 Download = "https://pypi.org/project/parse_type/"
-"Source Code" = "https://github.com/jenisys/parse_type"
-"Issue Tracker" = "https://github.com/jenisys/parse_type/issues/"
+Repository = "https://github.com/jenisys/parse_type"
+Issues = "https://github.com/jenisys/parse_type/issues/"
 
 
 [project.optional-dependencies]
@@ -94,7 +95,7 @@ testing = [
     "pytest-html >= 1.19.0",
 ]
 
-
+# -- KEEP-UNTIL: Python 2.7 support is removed.
 [tool.distutils.bdist_wheel]
 universal = true
 

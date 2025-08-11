@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: MIT
 """
 Setup script for "parse_type" package.
 
@@ -31,8 +32,8 @@ from setuptools import setup, find_packages
 # PREPARE SETUP:
 # -----------------------------------------------------------------------------
 HERE = os.path.dirname(__file__)
-README = os.path.join(HERE, "README.rst")
-long_description = ''.join(open(README).readlines()[4:])
+# DISABLED: README = os.path.join(HERE, "README.rst")
+# DISABLED: long_description = "".join(open(README).readlines()[4:])
 
 
 # -----------------------------------------------------------------------------
@@ -71,12 +72,19 @@ setup(
     url = "https://github.com/jenisys/parse_type",
     download_url= "http://pypi.python.org/pypi/parse_type",
     description = "Simplifies to build parse types based on the parse module",
-    long_description = long_description,
+    long_description = "file: README.rst",
+    long_description_content_type = "text/x-rst",
     keywords= "parse, parsing",
     license = "MIT",
+    license_files = ["LICENSE"],
     packages = find_packages_by_root_package("parse_type"),
     include_package_data = True,
-
+    project_urls = {
+        "Homepage": "https://github.com/jenisys/parse_type",
+        "Download": "https://pypi.org/project/parse_type/",
+        "Repository": "https://github.com/jenisys/parse_type",
+        "Issues": "https://github.com/jenisys/parse_type/issues/",
+    },
     # -- REQUIREMENTS:
     python_requires=">=2.7, !=3.0.*, !=3.1.*",
     setup_requires=[
@@ -130,7 +138,6 @@ setup(
         "Environment :: Console",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.2",
