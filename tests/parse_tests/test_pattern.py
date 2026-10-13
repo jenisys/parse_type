@@ -2,6 +2,13 @@ import pytest
 
 import parse
 
+# parse >= 1.22.2: Format type "f" also matches "nan" and "inf" values.
+PARSE_VERSION = tuple(int(x) for x in parse.__version__.split(".")[:3])
+if PARSE_VERSION >= (1, 22, 2):
+    FLOAT_PATTERN = r"([-+ ]?(?:\d*\.\d+|nan|NAN|inf|INF))"
+else:
+    FLOAT_PATTERN = r"([-+ ]?\d*\.\d+)"
+
 
 def _test_expression(format, expression):
     assert parse.Parser(format)._expression == expression
@@ -33,7 +40,7 @@ def test_named_typed():
 def test_numbered():
     _test_expression("{0}", r"(.+?)")
     _test_expression("{0} {1}", r"(.+?) (.+?)")
-    _test_expression("{0:f} {1:f}", r"([-+ ]?\d*\.\d+) ([-+ ]?\d*\.\d+)")
+    _test_expression("{0:f} {1:f}", FLOAT_PATTERN + " " + FLOAT_PATTERN)
 
 
 def test_bird():
